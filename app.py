@@ -57,7 +57,7 @@ with col_left:
 with col_right:
     if st.button("💾 Guardar cambios"):
         st.session_state.edited_df = st.session_state.latest_edited.copy()
-        st.success("Cambios guardados.")
+
 
 # Tabla editable
 edited = st.data_editor(
@@ -91,7 +91,6 @@ with col1:
 
     if st.button("📌 Aplicar valor"):
         st.session_state.edited_df = apply_bulk_value(st.session_state.edited_df, col_sel, val)
-        st.success("Valor aplicado.")
         st.rerun()
 
 with col2:
@@ -101,7 +100,6 @@ with col2:
     if st.button("🕒 Generar cada 27 min"):
         incs = generate_time_windows(d0, t0, len(st.session_state.edited_df))
         st.session_state.edited_df = fill_temporal_columns(st.session_state.edited_df, incs)
-        st.success("Tiempos generados.")
         st.rerun()
 
 with col3:
