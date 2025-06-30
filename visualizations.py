@@ -21,7 +21,7 @@ def render_map():
             "Longitude - Functional Location",
             "dBm",
         ]]
-        .dropna()
+       .dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"])
         .copy()
     )
     geo_points.rename(columns={
