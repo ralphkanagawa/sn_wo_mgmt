@@ -36,8 +36,6 @@ if not st.session_state.processed:
         st.rerun()
     else:
         st.stop()
-else:
-    st.success("Archivos cargados correctamente.")
 
 # Asegurar que todos los campos del template estén en el DataFrame
 disp = st.session_state.df.copy()
