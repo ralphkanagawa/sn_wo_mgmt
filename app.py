@@ -71,7 +71,7 @@ st.session_state.latest_edited = edited.copy()
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown("#### ➕ Añadir datos en bloque")
+    st.markdown("##### ➕ Añadir datos en bloque")
     editable_cols = [c for c in edited.columns if c not in config.protected_columns]
     col_sel = st.selectbox("Columna", editable_cols)
 
@@ -95,7 +95,7 @@ with col1:
         st.rerun()
 
 with col2:
-    st.markdown("#### ⏱️ Autocompletar fechas/horas")
+    st.markdown("##### ⏱️ Autocompletar fechas/horas")
     d0 = st.date_input("Fecha inicial", value=date.today())
     t0 = st.time_input("Hora inicial", value=datetime.now().time().replace(second=0, microsecond=0))
     if st.button("🕒 Generar cada 27 min"):
@@ -106,7 +106,7 @@ with col2:
         st.rerun()
 
 with col3:
-    st.markdown("#### 💾 Descargar Excel")
+    st.markdown("##### 💾 Descargar Excel")
     if st.button("Generar y descargar Excel"):
         df_out = st.session_state.edited_df.copy()
         for c in template_cols:
