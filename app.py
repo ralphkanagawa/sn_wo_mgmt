@@ -107,7 +107,7 @@ with col2:
 
 with col3:
     st.write("💾 Descargar Excel")
-    if st.button("Generar y descargar Excel"):
+    if st.button("Generar Excel"):
         df_out = st.session_state.edited_df.copy()
         for c in template_cols:
             if c not in df_out.columns:
