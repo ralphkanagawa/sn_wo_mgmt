@@ -151,25 +151,40 @@ with tab2:
     import contextily as ctx
     import matplotlib.pyplot as plt
 
-    def save_geoposition_map(df, path="map_contextual.png"):
-        fig, ax = plt.subplots(figsize=(8, 6))
+def save_geoposition_map(df, path="map_contextual.png"):
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-        sc = ax.scatter(
-            df["Longitude - Functional Location"],
-            df["Latitude - Functional Location"],
-            c=df["dBm"],
-            cmap="RdYlGn",
-            s=100,
-            alpha=0.8,
-            edgecolor='black'
-        )
+    # Separar puntos con y sin cobertura
+    df_with = df[df["dBm"].notna()]
+    df_without = df[df["dBm"].isna()]
 
-        ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-        ax.axis("off")
-        
-        plt.tight_layout()
-        plt.savefig(path, bbox_inches="tight", pad_inches=0)
-        plt.close()
+    # Puntos sin cobertura: gris
+    ax.scatter(
+        df_without["Longitude - Functional Location"],
+        df_without["Latitude - Functional Location"],
+        color="lightgray",
+        s=60,
+        alpha=0.6
+    )
+
+    # Puntos con cobertura: color según intensidad
+    ax.scatter(
+        df_with["Longitude - Functional Location"],
+        df_with["Latitude - Functional Location"],
+        c=df_with["dBm"],
+        cmap="RdYlGn",
+        s=60,
+        alpha=0.9
+    )
+
+    # Mapa base
+    ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
+
+    ax.axis("off")
+    plt.tight_layout()
+    plt.savefig(path, bbox_inches="tight", pad_inches=0)
+    plt.close()
+
 
     def render_pdf(template_path, context, output_path):
         with open(template_path, "r", encoding="utf-8") as f:
