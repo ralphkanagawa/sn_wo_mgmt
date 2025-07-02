@@ -210,14 +210,13 @@ with tab2:
         df = st.session_state.edited_df.copy()
         save_geoposition_map(df, "map_contextual.png")
 
-        # Crear parches para la leyenda
         legend_patches = [
-            mpatches.Patch(color='green', label='Buena cobertura (≥ -70 dBm)'),
-            mpatches.Patch(color='orange', label='Cobertura media (-80 a -70 dBm)'),
-            mpatches.Patch(color='red', label='Poca cobertura (< -80 dBm)'),
-            mpatches.Patch(color='lightgray', label='Sin datos')
+            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),
+            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),
+            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),
+            mpatches.Patch(color="lightgray", label="Sin datos")
         ]
-        ax.legend(handles=legend_patches, loc='lower left')
+        ax.legend(handles=legend_patches, loc="lower left")
 
 
         st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
