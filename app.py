@@ -131,7 +131,7 @@ with tab1:
             )
 
     render_map()
-    col1, col2, col3, col4 = st.columns(6)
+    col1, col2, col3, col4, col_spacer, col_spacer = st.columns(6)
     
     with col1:
         st.markdown("🟢 **Buena**", unsafe_allow_html=True)
