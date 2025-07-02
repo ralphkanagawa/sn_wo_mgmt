@@ -235,27 +235,30 @@ with tab2:
 
 
         if st.button("📄 Generar informe PDF"):
-            # Preparar métricas
-            total_ordenes = len(df)
-            total_yes = (df["Gateway"] == "YES").sum()
-            total_no = (df["Gateway"] == "NO").sum()
+            df_full = st.session_state.df.copy()
+            save_geoposition_map(df_full, "map_contextual.png")
         
-            parent_locations = df["Name - Parent Functional Location"].dropna().unique().tolist()
-            child_locations = df["Name - Child Functional Location"].dropna().unique().tolist()
-        
-            df["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
-                df,
+            # Obtener calles a partir de coordenadas
+            df_full["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
+                df_full,
                 "Latitude - Functional Location",
                 "Longitude - Functional Location"
             )
-            calles_validas = df["Calle (por coordenadas)"].dropna()
+            calles_validas = df_full["Calle (por coordenadas)"].dropna()
             calles_unicas = calles_validas.unique().tolist()
             ordenes_por_calle = calles_validas.value_counts().to_dict()
-
         
-            incident_types = df["Incident Type - Work Order"].dropna().unique().tolist()
-            owners = df["Owner - Work Order"].dropna().unique().tolist()
-            resources = df["Name - Bookable Resource Booking"].dropna().unique().tolist()
+            # Preparar métricas
+            total_ordenes = len(df_full)
+            total_yes = (df_full["Gateway"] == "YES").sum()
+            total_no = (df_full["Gateway"] == "NO").sum()
+        
+            parent_locations = df_full["Name - Parent Functional Location"].dropna().unique().tolist()
+            child_locations = df_full["Name - Child Functional Location"].dropna().unique().tolist()
+        
+            incident_types = df_full["Incident Type - Work Order"].dropna().unique().tolist()
+            owners = df_full["Owner - Work Order"].dropna().unique().tolist()
+            resources = df_full["Name - Bookable Resource Booking"].dropna().unique().tolist()
         
             context = {
                 "fecha": datetime.now().strftime("%d/%m/%Y"),
