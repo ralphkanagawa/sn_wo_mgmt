@@ -6,3 +6,4 @@ matplotlib
 jinja2
 xhtml2pdf
 contextily
+geopy
