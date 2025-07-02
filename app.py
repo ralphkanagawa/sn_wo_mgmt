@@ -215,14 +215,36 @@ with tab2:
 
 
         if st.button("📄 Generar informe PDF"):
+            # Preparar métricas
+            total_ordenes = len(df)
+            total_yes = (df["Gateway"] == "YES").sum()
+            total_no = (df["Gateway"] == "NO").sum()
+        
+            parent_locations = df["Name - Parent Functional Location"].dropna().unique().tolist()
+            child_locations = df["Name - Child Functional Location"].dropna().unique().tolist()
+        
+            calles = df["Address"].dropna()
+            calles_unicas = calles.unique().tolist()
+            ordenes_por_calle = calles.value_counts().to_dict()
+        
+            incident_types = df["Incident Type - Work Order"].dropna().unique().tolist()
+            owners = df["Owner - Work Order"].dropna().unique().tolist()
+            resources = df["Name - Bookable Resource Booking"].dropna().unique().tolist()
+        
             context = {
                 "fecha": datetime.now().strftime("%d/%m/%Y"),
-                "total_ordenes": len(df),
-                "total_yes": (df["Gateway"] == "YES").sum(),
-                "total_no": (df["Gateway"] == "NO").sum(),
-                "columnas": df.columns.tolist(),
-                "filas": df.values.tolist()
+                "total_ordenes": total_ordenes,
+                "total_yes": total_yes,
+                "total_no": total_no,
+                "parent_locations": parent_locations,
+                "child_locations": child_locations,
+                "calles": calles_unicas,
+                "ordenes_por_calle": ordenes_por_calle,
+                "incident_types": incident_types,
+                "owners": owners,
+                "resources": resources,
             }
+        
             render_pdf("report_template.html", context, "informe.pdf")
             with open("informe.pdf", "rb") as f:
                 st.download_button(
