@@ -165,12 +165,10 @@ with tab2:
         )
 
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-        ax.set_title("Mapa de cobertura (con contexto geográfico)")
-        ax.set_xlabel("Longitud")
-        ax.set_ylabel("Latitud")
-        plt.colorbar(sc, label="dBm")
+        ax.axis("off")
+        
         plt.tight_layout()
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
 
     def render_pdf(template_path, context, output_path):
