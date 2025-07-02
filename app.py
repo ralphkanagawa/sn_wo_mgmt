@@ -171,35 +171,37 @@ with tab2:
         df_without = df[df["dBm"].isna()]
     
         # Puntos sin cobertura: gris claro
-        ax.scatter(
-            df_without["Longitude - Functional Location"],
-            df_without["Latitude - Functional Location"],
-            color="lightgray",
-            s=50,
-            alpha=0.9,
-            edgecolors="black"
-        )
+        if not df_without.empty:
+            ax.scatter(
+                df_without["Longitude - Functional Location"],
+                df_without["Latitude - Functional Location"],
+                color="lightgray",
+                s=50,
+                alpha=0.9,
+                edgecolors="black"
+            )
     
         # Puntos con cobertura: color por intensidad (cmap aplicado)
-        scatter = ax.scatter(
-            df_with["Longitude - Functional Location"],
-            df_with["Latitude - Functional Location"],
-            c=df_with["dBm"],
-            cmap="RdYlGn",
-            s=60,
-            alpha=0.9,
-            edgecolors="black"
-        )
+        if not df_with.empty:
+            scatter = ax.scatter(
+                df_with["Longitude - Functional Location"],
+                df_with["Latitude - Functional Location"],
+                c=df_with["dBm"],
+                cmap="RdYlGn",
+                s=60,
+                alpha=0.9,
+                edgecolors="black"
+            )
     
         # Mapa base
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
     
-        # Leyenda con colores RGB aproximados de 'RdYlGn'
+        # Leyenda estática con colores aproximados
         legend_patches = [
-            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),  # verde
-            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),  # naranja
-            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),  # rojo
-            mpatches.Patch(color="lightgray", label="Sin datos")  # gris
+            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),     # verde
+            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"), # naranja
+            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),      # rojo
+            mpatches.Patch(color="lightgray", label="Sin datos")                      # gris
         ]
         ax.legend(handles=legend_patches, loc="lower left")
     
