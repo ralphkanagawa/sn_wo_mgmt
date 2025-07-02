@@ -242,9 +242,15 @@ with tab2:
             parent_locations = df["Name - Parent Functional Location"].dropna().unique().tolist()
             child_locations = df["Name - Child Functional Location"].dropna().unique().tolist()
         
-            calles = df["Address"].dropna()
-            calles_unicas = calles.unique().tolist()
-            ordenes_por_calle = calles.value_counts().to_dict()
+            df["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
+                df,
+                "Latitude - Functional Location",
+                "Longitude - Functional Location"
+            )
+            calles_validas = df["Calle (por coordenadas)"].dropna()
+            calles_unicas = calles_validas.unique().tolist()
+            ordenes_por_calle = calles_validas.value_counts().to_dict()
+
         
             incident_types = df["Incident Type - Work Order"].dropna().unique().tolist()
             owners = df["Owner - Work Order"].dropna().unique().tolist()
