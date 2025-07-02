@@ -160,24 +160,29 @@ with tab2:
     import matplotlib.patches as mpatches
 
     def save_geoposition_map(df, path="map_contextual.png"):
+        import matplotlib.pyplot as plt
+        import contextily as ctx
+        import matplotlib.patches as mpatches
+    
         fig, ax = plt.subplots(figsize=(8, 6))
-
+    
         # Separar puntos con y sin cobertura
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
-
-        # Puntos sin cobertura: gris
+    
+        # Puntos sin cobertura: gris claro
         ax.scatter(
             df_without["Longitude - Functional Location"],
             df_without["Latitude - Functional Location"],
             color="lightgray",
             s=50,
             alpha=0.9,
-            edgecolors="black"
+            edgecolors="black",
+            label="Sin datos"
         )
-
-        # Puntos con cobertura: color según intensidad
-        ax.scatter(
+    
+        # Puntos con cobertura: color por intensidad
+        scatter = ax.scatter(
             df_with["Longitude - Functional Location"],
             df_with["Latitude - Functional Location"],
             c=df_with["dBm"],
@@ -186,10 +191,19 @@ with tab2:
             alpha=0.9,
             edgecolors="black"
         )
-
+    
         # Mapa base
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-
+    
+        # Leyenda manual con colores definidos
+        legend_patches = [
+            mpatches.Patch(color='green', label='Buena cobertura (≥ -70 dBm)'),
+            mpatches.Patch(color='orange', label='Cobertura media (-80 a -70 dBm)'),
+            mpatches.Patch(color='red', label='Poca cobertura (< -80 dBm)'),
+            mpatches.Patch(color='lightgray', label='Sin datos'),
+        ]
+        ax.legend(handles=legend_patches, loc='lower left')
+    
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
@@ -206,7 +220,6 @@ with tab2:
     else:
         df = st.session_state.edited_df.copy()
         save_geoposition_map(df, "map_contextual.png")
-        import matplotlib.patches as mpatches
 
         # Crear parches para la leyenda
         legend_patches = [
