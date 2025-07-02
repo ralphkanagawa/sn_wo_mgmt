@@ -31,9 +31,6 @@ with col_logo:
 with col_tabs:
     tab1, tab2 = st.tabs(["🧭 Gestión de órdenes", "📄 Generar informe"])
 
-# Crear pestañas superiores
-tab1, tab2 = st.tabs(["🧭 Gestión de órdenes", "📄 Generar informe"])
-
 # TAB 1 - Todo el flujo actual
 with tab1:
 
