@@ -139,13 +139,13 @@ with tab1:
     # Mapa interactivo
     render_map()
     with st.container():
-    st.markdown("""
-    **Leyenda de colores del mapa:**
-    - 🟢 dBm ≥ -70 (Buena cobertura)
-    - 🟠 -80 ≤ dBm < -70 (Cobertura media)
-    - 🔴 dBm < -80 (Poca o nula cobertura)
-    - ⚪ Sin datos de cobertura
-    """)
+        st.markdown("""
+        **Leyenda de colores del mapa:**
+        - 🟢 dBm ≥ -70 (Buena cobertura)
+        - 🟠 -80 ≤ dBm < -70 (Cobertura media)
+        - 🔴 dBm < -80 (Poca o nula cobertura)
+        - ⚪ Sin datos de cobertura
+        """)
     
     st.caption("Desarrollado en Streamlit • Última actualización: 2025-06-30")
     
