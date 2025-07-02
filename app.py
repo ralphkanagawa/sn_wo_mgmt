@@ -8,10 +8,6 @@ from file_processing import load_and_process_files
 from editor_utils import apply_bulk_value, generate_time_windows, fill_temporal_columns
 from visualizations import render_map
 
-import matplotlib.pyplot as plt
-from jinja2 import Template
-from xhtml2pdf import pisa
-
 # Configuración de la página
 st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
 
@@ -150,19 +146,29 @@ with tab1:
 with tab2:
     st.markdown("### Generación de informe PDF")
 
-    def save_static_map(df, path="map.png"):
+    from jinja2 import Template
+    from xhtml2pdf import pisa
+    import contextily as ctx
+    import matplotlib.pyplot as plt
+
+    def save_geoposition_map(df, path="map_contextual.png"):
         fig, ax = plt.subplots(figsize=(8, 6))
-        scatter = ax.scatter(
+
+        sc = ax.scatter(
             df["Longitude - Functional Location"],
             df["Latitude - Functional Location"],
             c=df["dBm"],
-            cmap="RdYlGn", s=20, alpha=0.8
+            cmap="RdYlGn",
+            s=100,
+            alpha=0.8,
+            edgecolor='black'
         )
-        ax.set_title("Mapa de cobertura (estático)")
+
+        ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
+        ax.set_title("Mapa de cobertura (con contexto geográfico)")
         ax.set_xlabel("Longitud")
         ax.set_ylabel("Latitud")
-        plt.colorbar(scatter, label="dBm")
-        plt.grid(True)
+        plt.colorbar(sc, label="dBm")
         plt.tight_layout()
         plt.savefig(path)
         plt.close()
@@ -177,8 +183,9 @@ with tab2:
         st.warning("No hay datos disponibles. Por favor, carga y edita datos en la pestaña anterior.")
     else:
         df = st.session_state.edited_df.copy()
-        save_static_map(df, "map.png")
-        st.image("map.png", caption="Mapa de cobertura (estático)", use_container_width=True)
+        save_geoposition_map(df, "map_contextual.png")
+
+        st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
 
         if st.button("📄 Generar informe PDF"):
             context = {
@@ -191,4 +198,9 @@ with tab2:
             }
             render_pdf("report_template.html", context, "informe.pdf")
             with open("informe.pdf", "rb") as f:
-                st.download_button("⬇️ Descargar informe PDF", data=f, file_name="informe.pdf", mime="application/pdf")
+                st.download_button(
+                    "⬇️ Descargar informe PDF",
+                    data=f,
+                    file_name="informe.pdf",
+                    mime="application/pdf"
+                )
