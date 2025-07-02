@@ -27,9 +27,7 @@ template_cols = load_excel_template_columns(config.excel_template_path)
 st.image("logotipo-salvi-2024.png", width=120)
 
 # Crear pestañas inferiores
-tab1, tab2 = st.tabs(["🛭 Gestión de órdenes", "📄 Generar informe"])
-
-tab1, tab2 = st.tabs(["\U0001F6ED Gestión de órdenes", "\U0001F4C4 Generar informe"])
+tab1, tab2 = st.tabs(["Gestión de órdenes", "Generar informe"])
 
 # TAB 1 - Todo el flujo actual
 with tab1:
