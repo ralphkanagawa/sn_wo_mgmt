@@ -177,11 +177,10 @@ with tab2:
             color="lightgray",
             s=50,
             alpha=0.9,
-            edgecolors="black",
-            label="Sin datos"
+            edgecolors="black"
         )
     
-        # Puntos con cobertura: color por intensidad
+        # Puntos con cobertura: color por intensidad (cmap aplicado)
         scatter = ax.scatter(
             df_with["Longitude - Functional Location"],
             df_with["Latitude - Functional Location"],
@@ -195,19 +194,20 @@ with tab2:
         # Mapa base
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
     
-        # Leyenda manual con colores definidos
+        # Leyenda con colores RGB aproximados de 'RdYlGn'
         legend_patches = [
-            mpatches.Patch(color='green', label='Buena cobertura (≥ -70 dBm)'),
-            mpatches.Patch(color='orange', label='Cobertura media (-80 a -70 dBm)'),
-            mpatches.Patch(color='red', label='Poca cobertura (< -80 dBm)'),
-            mpatches.Patch(color='lightgray', label='Sin datos'),
+            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),  # verde
+            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),  # naranja
+            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),  # rojo
+            mpatches.Patch(color="lightgray", label="Sin datos")  # gris
         ]
-        ax.legend(handles=legend_patches, loc='lower left')
+        ax.legend(handles=legend_patches, loc="lower left")
     
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
+
 
     def render_pdf(template_path, context, output_path):
         with open(template_path, "r", encoding="utf-8") as f:
