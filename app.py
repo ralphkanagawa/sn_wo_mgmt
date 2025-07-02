@@ -22,7 +22,15 @@ if "latest_edited" not in st.session_state:
 # Cargar configuración
 config = load_config()
 template_cols = load_excel_template_columns(config.excel_template_path)
-    
+
+col_logo, col_tabs = st.columns([1, 6])
+
+with col_logo:
+    st.image("logotipo-salvi-2024.png", width=120)
+
+with col_tabs:
+    tab1, tab2 = st.tabs(["🧭 Gestión de órdenes", "📄 Generar informe"])
+
 # Crear pestañas superiores
 tab1, tab2 = st.tabs(["🧭 Gestión de órdenes", "📄 Generar informe"])
 
