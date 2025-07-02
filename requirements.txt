@@ -5,4 +5,4 @@ pydeck>=0.8
 matplotlib
 jinja2
 xhtml2pdf
-contextly
+contextily
