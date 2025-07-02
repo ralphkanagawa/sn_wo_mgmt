@@ -199,6 +199,22 @@ with tab2:
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
 
+    def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
+        geolocator = Nominatim(user_agent="cm_salvi_app")
+        geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1, return_value_on_exception=None)
+    
+        calles = []
+        for _, row in df.iterrows():
+            lat, lon = row[lat_col], row[lon_col]
+            if pd.notna(lat) and pd.notna(lon):
+                location = geocode((lat, lon), language="es")
+                calle = location.raw["address"].get("road") if location else None
+                calles.append(calle)
+            else:
+                calles.append(None)
+        return calles
+
+
     def render_pdf(template_path, context, output_path):
         with open(template_path, "r", encoding="utf-8") as f:
             html = Template(f.read()).render(**context)
