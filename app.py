@@ -163,7 +163,7 @@ with tab2:
             df_without["Longitude - Functional Location"],
             df_without["Latitude - Functional Location"],
             color="lightgray",
-            s=60,
+            s=50,
             alpha=0.9,
             edgecolors="black"
         )
@@ -175,7 +175,8 @@ with tab2:
             c=df_with["dBm"],
             cmap="RdYlGn",
             s=60,
-            alpha=0.9
+            alpha=0.9,
+            edgecolors="black"
         )
 
         # Mapa base
