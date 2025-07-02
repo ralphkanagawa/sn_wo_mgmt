@@ -23,13 +23,13 @@ if "latest_edited" not in st.session_state:
 config = load_config()
 template_cols = load_excel_template_columns(config.excel_template_path)
 
-col_logo, col_tabs = st.columns([1, 6])
+# Encabezado con logo
+st.image("logotipo-salvi-2024.png", width=120)
 
-with col_logo:
-    st.image("logotipo-salvi-2024.png", width=120)
+# Crear pestañas inferiores
+tab1, tab2 = st.tabs(["🛭 Gestión de órdenes", "📄 Generar informe"])
 
-with col_tabs:
-    tab1, tab2 = st.tabs(["🧭 Gestión de órdenes", "📄 Generar informe"])
+tab1, tab2 = st.tabs(["\U0001F6ED Gestión de órdenes", "\U0001F4C4 Generar informe"])
 
 # TAB 1 - Todo el flujo actual
 with tab1:
