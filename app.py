@@ -208,7 +208,11 @@ with tab2:
         df = st.session_state.edited_df.copy()
         save_geoposition_map(df, "map_contextual.png")
 
-        st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
+        col1, col2, col3 = st.columns([1, 2, 1])  # columna central más ancha
+        
+        with col2:
+            st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_column_width=True)
+
 
         if st.button("📄 Generar informe PDF"):
             context = {
