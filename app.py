@@ -179,7 +179,7 @@ with tab2:
     else:
         df = st.session_state.edited_df.copy()
         save_static_map(df, "map.png")
-        st.image("map.png", caption="Mapa de cobertura (estático)", use_column_width=True)
+        st.image("map.png", caption="Mapa de cobertura (estático)", use_container_width=True)
 
         if st.button("📄 Generar informe PDF"):
             context = {
