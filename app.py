@@ -224,8 +224,9 @@ with tab2:
     if st.session_state.edited_df.empty:
         st.warning("No hay datos disponibles. Por favor, carga y edita datos en la pestaña anterior.")
     else:
-        df = st.session_state.edited_df.copy()
-        save_geoposition_map(df, "map_contextual.png")
+        df_full = st.session_state.df.copy()
+        save_geoposition_map(df_full, "map_contextual.png")
+
 
         col1, col2, col3 = st.columns([1, 2, 1])  # columna central más ancha
         
