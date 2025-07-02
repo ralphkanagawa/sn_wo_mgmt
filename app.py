@@ -9,7 +9,7 @@ from editor_utils import apply_bulk_value, generate_time_windows, fill_temporal_
 from visualizations import render_map
 
 import matplotlib.pyplot as plt
-import jinja2 import Template
+from jinja2 import Template
 from xhtml2pdf import pisa
 
 # Configuración de la página
