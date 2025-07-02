@@ -11,24 +11,24 @@ from visualizations import render_map
 # Configuración de la página
 st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
 
+# Inicialización
+if "processed" not in st.session_state:
+    st.session_state.processed = False
+if "edited_df" not in st.session_state:
+    st.session_state.edited_df = pd.DataFrame()
+if "latest_edited" not in st.session_state:
+    st.session_state.latest_edited = pd.DataFrame()
+    
+# Cargar configuración
+config = load_config()
+template_cols = load_excel_template_columns(config.excel_template_path)
+    
 # Crear pestañas superiores
 tab1, tab2 = st.tabs(["🧭 Gestión de órdenes", "📄 Generar informe"])
 
 # TAB 1 - Todo el flujo actual
 with tab1:
 
-    # Inicialización
-    if "processed" not in st.session_state:
-        st.session_state.processed = False
-    if "edited_df" not in st.session_state:
-        st.session_state.edited_df = pd.DataFrame()
-    if "latest_edited" not in st.session_state:
-        st.session_state.latest_edited = pd.DataFrame()
-    
-    # Cargar configuración
-    config = load_config()
-    template_cols = load_excel_template_columns(config.excel_template_path)
-    
     # Cargar archivos CSV
     if not st.session_state.processed:
         col_geo, col_cov = st.columns(2)
