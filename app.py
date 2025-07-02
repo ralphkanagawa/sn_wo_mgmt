@@ -162,15 +162,13 @@ with tab2:
     def save_geoposition_map(df, path="map_contextual.png"):
         import matplotlib.pyplot as plt
         import contextily as ctx
-        import matplotlib.patches as mpatches
+        import matplotlib.patches as mpatches  # ← ESTA IMPORTACIÓN ES CRUCIAL
     
         fig, ax = plt.subplots(figsize=(8, 6))
     
-        # Separar puntos con y sin cobertura
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
     
-        # Puntos sin cobertura: gris claro
         if not df_without.empty:
             ax.scatter(
                 df_without["Longitude - Functional Location"],
@@ -181,9 +179,8 @@ with tab2:
                 edgecolors="black"
             )
     
-        # Puntos con cobertura: color por intensidad (cmap aplicado)
         if not df_with.empty:
-            scatter = ax.scatter(
+            ax.scatter(
                 df_with["Longitude - Functional Location"],
                 df_with["Latitude - Functional Location"],
                 c=df_with["dBm"],
@@ -193,15 +190,14 @@ with tab2:
                 edgecolors="black"
             )
     
-        # Mapa base
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
     
-        # Leyenda estática con colores aproximados
+        # DEFINICIÓN DIRECTA DE LA LEYENDA
         legend_patches = [
-            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),     # verde
-            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"), # naranja
-            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),      # rojo
-            mpatches.Patch(color="lightgray", label="Sin datos")                      # gris
+            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),
+            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),
+            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),
+            mpatches.Patch(color="lightgray", label="Sin datos")
         ]
         ax.legend(handles=legend_patches, loc="lower left")
     
