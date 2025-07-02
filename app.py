@@ -164,7 +164,7 @@ with tab2:
             df_without["Latitude - Functional Location"],
             color="lightgray",
             s=60,
-            alpha=0.6
+            alpha=0.9
         )
 
         # Puntos con cobertura: color según intensidad
