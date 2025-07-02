@@ -142,7 +142,49 @@ with tab1:
     st.caption("Desarrollado en Streamlit • Última actualización: 2025-06-30")
     
 
-# TAB 2 - Vacío por ahora
+# --- TAB 2: Generación del Informe PDF ---
 with tab2:
     st.markdown("### Generación de informe PDF")
-    st.info("Esta sección permitirá generar un informe formal con los datos y un mapa estático.")
+
+    def save_static_map(df, path="map.png"):
+        fig, ax = plt.subplots(figsize=(8, 6))
+        scatter = ax.scatter(
+            df["Longitude - Functional Location"],
+            df["Latitude - Functional Location"],
+            c=df["dBm"],
+            cmap="RdYlGn", s=20, alpha=0.8
+        )
+        ax.set_title("Mapa de cobertura (estático)")
+        ax.set_xlabel("Longitud")
+        ax.set_ylabel("Latitud")
+        plt.colorbar(scatter, label="dBm")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close()
+
+    def render_pdf(template_path, context, output_path):
+        with open(template_path, "r", encoding="utf-8") as f:
+            html = Template(f.read()).render(**context)
+        with open(output_path, "wb") as f:
+            pisa.CreatePDF(html, dest=f)
+
+    if st.session_state.edited_df.empty:
+        st.warning("No hay datos disponibles. Por favor, carga y edita datos en la pestaña anterior.")
+    else:
+        df = st.session_state.edited_df.copy()
+        save_static_map(df, "map.png")
+        st.image("map.png", caption="Mapa de cobertura (estático)", use_column_width=True)
+
+        if st.button("📄 Generar informe PDF"):
+            context = {
+                "fecha": datetime.now().strftime("%d/%m/%Y"),
+                "total_ordenes": len(df),
+                "total_yes": (df["Gateway"] == "YES").sum(),
+                "total_no": (df["Gateway"] == "NO").sum(),
+                "columnas": df.columns.tolist(),
+                "filas": df.values.tolist()
+            }
+            render_pdf("report_template.html", context, "informe.pdf")
+            with open("informe.pdf", "rb") as f:
+                st.download_button("⬇️ Descargar informe PDF", data=f, file_name="informe.pdf", mime="application/pdf")
