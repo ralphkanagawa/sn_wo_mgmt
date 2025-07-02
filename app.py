@@ -18,7 +18,7 @@ if "edited_df" not in st.session_state:
     st.session_state.edited_df = pd.DataFrame()
 if "latest_edited" not in st.session_state:
     st.session_state.latest_edited = pd.DataFrame()
-    
+
 # Cargar configuración
 config = load_config()
 template_cols = load_excel_template_columns(config.excel_template_path)
@@ -31,43 +31,38 @@ tab1, tab2 = st.tabs(["Gestión de órdenes", "Generar informe"])
 
 # TAB 1 - Todo el flujo actual
 with tab1:
-
-    # Cargar archivos CSV
     if not st.session_state.processed:
         col_geo, col_cov = st.columns(2)
         with col_geo:
             geo_file = st.file_uploader("📍 Georadar CSV", type="csv")
         with col_cov:
             cov_file = st.file_uploader("📶 Coverage CSV", type="csv")
-    
+
         if geo_file and cov_file:
             load_and_process_files(geo_file, cov_file, config)
             st.rerun()
         else:
             st.stop()
-    
-    # Asegurar que todos los campos del template estén en el DataFrame
+
     disp = st.session_state.df.copy()
     for c in template_cols:
         if c not in disp.columns:
             disp[c] = ""
     disp = disp[template_cols]
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
-    
-    # Controles superiores
+
     col_left, col_spacer, col_right = st.columns([2, 6, 2])
-    
+
     with col_left:
         if st.button("🔁 Volver a cargar archivos"):
             for key in ["processed", "df", "geo_df", "cov_df", "edited_df", "latest_edited"]:
                 st.session_state.pop(key, None)
             st.rerun()
-    
+
     with col_right:
         if st.button("💾 Guardar cambios"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
-    
-    # Tabla editable
+
     edited = st.data_editor(
         st.session_state.edited_df,
         num_rows="dynamic",
@@ -75,15 +70,14 @@ with tab1:
         key="editor"
     )
     st.session_state.latest_edited = edited.copy()
-    
-    # Controles por columna
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.write("➕ Añadir datos en bloque")
         editable_cols = [c for c in edited.columns if c not in config.protected_columns]
         col_sel = st.selectbox("Columna", editable_cols)
-    
+
         val = ""
         if col_sel == "Name - Child Functional Location":
             parents = edited["Name - Parent Functional Location"].dropna().unique()
@@ -96,13 +90,13 @@ with tab1:
             val = st.selectbox("Valor", config.dropdown_values[col_sel])
         else:
             val = st.text_input("Valor")
-    
+
         if st.button("📌 Aplicar valor"):
             new_df = apply_bulk_value(st.session_state.latest_edited.copy(), col_sel, val)
             st.session_state.edited_df = new_df
             st.session_state.latest_edited = new_df.copy()
             st.rerun()
-    
+
     with col2:
         st.write("⏱️ Autocompletar fechas/horas")
         d0 = st.date_input("Fecha inicial", value=date.today())
@@ -113,7 +107,7 @@ with tab1:
             st.session_state.edited_df = new_df
             st.session_state.latest_edited = new_df.copy()
             st.rerun()
-    
+
     with col3:
         st.write("💾 Descargar Excel")
         if st.button("Generar Excel"):
@@ -122,12 +116,12 @@ with tab1:
                 if c not in df_out.columns:
                     df_out[c] = ""
             df_out = df_out[template_cols]
-    
+
             buf = io.BytesIO()
             with pd.ExcelWriter(buf, engine="openpyxl") as w:
                 df_out.to_excel(w, index=False)
             buf.seek(0)
-    
+
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button(
                 "⬇️ Descargar Excel",
@@ -135,20 +129,19 @@ with tab1:
                 file_name=f"workorders_{ts}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
-    
-    # Mapa interactivo
+
     render_map()
     with st.container():
         st.markdown("""
-        **Leyenda de colores del mapa:**
+        ### 🗺️ Leyenda de colores del mapa interactivo:
         - 🟢 dBm ≥ -70 (Buena cobertura)
         - 🟠 -80 ≤ dBm < -70 (Cobertura media)
         - 🔴 dBm < -80 (Poca o nula cobertura)
         - ⚪ Sin datos de cobertura
         """)
-    
+
     st.caption("Desarrollado en Streamlit • Última actualización: 2025-06-30")
-    
+
 # --- TAB 2: Generación del Informe PDF ---
 with tab2:
     st.markdown("### Generación de informe PDF")
@@ -160,15 +153,11 @@ with tab2:
     import matplotlib.patches as mpatches
 
     def save_geoposition_map(df, path="map_contextual.png"):
-        import matplotlib.pyplot as plt
-        import contextily as ctx
-        import matplotlib.patches as mpatches  # ← ESTA IMPORTACIÓN ES CRUCIAL
-    
         fig, ax = plt.subplots(figsize=(8, 6))
-    
+
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
-    
+
         if not df_without.empty:
             ax.scatter(
                 df_without["Longitude - Functional Location"],
@@ -178,7 +167,7 @@ with tab2:
                 alpha=0.9,
                 edgecolors="black"
             )
-    
+
         if not df_with.empty:
             ax.scatter(
                 df_with["Longitude - Functional Location"],
@@ -189,14 +178,21 @@ with tab2:
                 alpha=0.9,
                 edgecolors="black"
             )
-    
+
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-    
+
+        legend_patches = [
+            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),
+            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),
+            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),
+            mpatches.Patch(color="lightgray", label="Sin datos")
+        ]
+        ax.legend(handles=legend_patches, loc="lower left")
+
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
-
 
     def render_pdf(template_path, context, output_path):
         with open(template_path, "r", encoding="utf-8") as f:
@@ -209,15 +205,6 @@ with tab2:
     else:
         df = st.session_state.edited_df.copy()
         save_geoposition_map(df, "map_contextual.png")
-
-        legend_patches = [
-            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -70 dBm)"),
-            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),
-            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),
-            mpatches.Patch(color="lightgray", label="Sin datos")
-        ]
-        ax.legend(handles=legend_patches, loc="lower left")
-
 
         st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
 
