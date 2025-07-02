@@ -64,29 +64,24 @@
     </header>
 
     <h2 class="section-title">Resumen</h2>
-    <p>Total de órdenes: <strong>{{ total_ordenes }}</strong></p>
-    <p>Órdenes con cobertura (Gateway = YES): <strong>{{ total_yes }}</strong></p>
-    <p>Órdenes sin cobertura (Gateway = NO): <strong>{{ total_no }}</strong></p>
+    <p><strong>Total de órdenes:</strong> {{ total_ordenes }}</p>
+    <p><strong>Órdenes con cobertura (Gateway = YES):</strong> {{ total_yes }}</p>
+    <p><strong>Órdenes sin cobertura (Gateway = NO):</strong> {{ total_no }}</p>
 
-    <h2 class="section-title">Detalle de órdenes</h2>
-    <table>
-        <thead>
-            <tr>
-            {% for col in columnas %}
-                <th>{{ col }}</th>
-            {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-        {% for row in filas %}
-            <tr>
-            {% for cell in row %}
-                <td>{{ cell }}</td>
-            {% endfor %}
-            </tr>
+    <p><strong>Localidades padre:</strong> {{ parent_locations | join(', ') }}</p>
+    <p><strong>Localidades hijo:</strong> {{ child_locations | join(', ') }}</p>
+
+    <p><strong>Calles con órdenes:</strong> {{ calles | join(', ') }}</p>
+    <p><strong>Órdenes por calle:</strong></p>
+    <ul>
+        {% for calle, count in ordenes_por_calle.items() %}
+            <li>{{ calle }}: {{ count }}</li>
         {% endfor %}
-        </tbody>
-    </table>
+    </ul>
+
+    <p><strong>Tipos de incidente:</strong> {{ incident_types | join(', ') }}</p>
+    <p><strong>Propietarios (Owner):</strong> {{ owners | join(', ') }}</p>
+    <p><strong>Equipos asignados (Bookable Resource Booking):</strong> {{ resources | join(', ') }}</p>
 
     <div class="map-section">
         <h2 class="section-title">Mapa de cobertura</h2>
