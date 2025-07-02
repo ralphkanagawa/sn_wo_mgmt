@@ -8,6 +8,9 @@ from file_processing import load_and_process_files
 from editor_utils import apply_bulk_value, generate_time_windows, fill_temporal_columns
 from visualizations import render_map
 
+import matplotlib.pyplot as plt
+
+
 # Configuración de la página
 st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
 
