@@ -157,6 +157,7 @@ with tab2:
     from xhtml2pdf import pisa
     import contextily as ctx
     import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
 
     def save_geoposition_map(df, path="map_contextual.png"):
         fig, ax = plt.subplots(figsize=(8, 6))
@@ -205,6 +206,17 @@ with tab2:
     else:
         df = st.session_state.edited_df.copy()
         save_geoposition_map(df, "map_contextual.png")
+        import matplotlib.patches as mpatches
+
+        # Crear parches para la leyenda
+        legend_patches = [
+            mpatches.Patch(color='green', label='Buena cobertura (≥ -70 dBm)'),
+            mpatches.Patch(color='orange', label='Cobertura media (-80 a -70 dBm)'),
+            mpatches.Patch(color='red', label='Poca cobertura (< -80 dBm)'),
+            mpatches.Patch(color='lightgray', label='Sin datos')
+        ]
+        ax.legend(handles=legend_patches, loc='lower left')
+
 
         st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
 
