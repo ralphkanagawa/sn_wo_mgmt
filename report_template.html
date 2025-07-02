@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe de Órdenes de Trabajo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 40px;
+            color: #333;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        header img {
+            height: 60px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 0;
+        }
+        .section-title {
+            font-size: 20px;
+            margin-top: 30px;
+            border-bottom: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 6px 8px;
+            text-align: left;
+        }
+        .map-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+        footer {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 50px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="CM Salvi Logo">
+        <div>
+            <h1>Informe de Órdenes de Trabajo</h1>
+            <p>Fecha de generación: {{ fecha }}</p>
+        </div>
+    </header>
+
+    <h2 class="section-title">Resumen</h2>
+    <p>Total de órdenes: <strong>{{ total_ordenes }}</strong></p>
+    <p>Órdenes con cobertura (Gateway = YES): <strong>{{ total_yes }}</strong></p>
+    <p>Órdenes sin cobertura (Gateway = NO): <strong>{{ total_no }}</strong></p>
+
+    <h2 class="section-title">Detalle de órdenes</h2>
+    <table>
+        <thead>
+            <tr>
+            {% for col in columnas %}
+                <th>{{ col }}</th>
+            {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in filas %}
+            <tr>
+            {% for cell in row %}
+                <td>{{ cell }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="map-section">
+        <h2 class="section-title">Mapa de cobertura</h2>
+        <img src="map.png" alt="Mapa de cobertura" style="width: 90%; border: 1px solid #ccc;">
+    </div>
+
+    <footer>
+        Desarrollado por CM Salvi con tecnología Streamlit
+    </footer>
+</body>
+</html>
