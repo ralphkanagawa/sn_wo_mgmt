@@ -165,6 +165,7 @@ with tab2:
             color="lightgray",
             s=60,
             alpha=0.9
+            edgecolors="black"
         )
 
         # Puntos con cobertura: color según intensidad
