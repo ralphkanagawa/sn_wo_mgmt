@@ -174,7 +174,7 @@ with tab2:
             c=df_with["dBm"],
             cmap="RdYlGn",
             s=60,
-            alpha=0.9
+            alpha=0.3
         )
 
         # Mapa base
