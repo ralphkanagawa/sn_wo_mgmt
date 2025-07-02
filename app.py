@@ -131,14 +131,16 @@ with tab1:
             )
 
     render_map()
-    with st.container():
-        st.markdown("""
-        ### 🗺️ Leyenda de colores del mapa interactivo:
-        - 🟢 dBm ≥ -70 (Buena cobertura)
-        - 🟠 -80 ≤ dBm < -70 (Cobertura media)
-        - 🔴 dBm < -80 (Poca o nula cobertura)
-        - ⚪ Sin datos de cobertura
-        """)
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown("🟢 **Buena**", unsafe_allow_html=True)
+    with col2:
+        st.markdown("🟠 **Justa**", unsafe_allow_html=True)
+    with col3:
+        st.markdown("🔴 **Insuficiente**", unsafe_allow_html=True)
+    with col4:
+        st.markdown("⚪ **Sin datos**", unsafe_allow_html=True)
 
     st.caption("Desarrollado en Streamlit • Última actualización: 2025-06-30")
 
