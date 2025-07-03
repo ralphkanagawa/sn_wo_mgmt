@@ -5,7 +5,7 @@ from utils import classify_signal
 from scipy.spatial import cKDTree
 import numpy as np
 
-def asignar_cobertura_por_proximidad(geo_df, cov_df, max_dist_metros=30):
+def asignar_cobertura_por_proximidad(geo_df, cov_df, max_dist_metros=10):
     def latlon_to_cartesian(lat, lon):
         R = 6371000  # radio de la Tierra en metros
         phi = np.radians(lat)
