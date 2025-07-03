@@ -5,7 +5,7 @@ from scipy.spatial import cKDTree
 from utils import classify_signal
 
 
-def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15):
+def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=10):
     def latlon_to_cartesian(lat, lon):
         R = 6371000  # radio de la Tierra en metros
         phi = np.radians(lat)
@@ -33,7 +33,7 @@ def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15):
         if vecinos:
             valores = cov_df.iloc[vecinos]["RSSI / RSCP (dBm)"].dropna().tolist()
             if valores:
-                medias.append(np.mean(valores))
+                medias.append(round(np.mean(valores)))
             else:
                 medias.append(None)
         else:
@@ -64,7 +64,7 @@ def load_and_process_files(geo_file, cov_file, config):
     gdf["Work Order Type - Work Order"] = "Installation"
 
     # Asignar cobertura por promedio en radio
-    gdf = asignar_cobertura_promedio_por_radio(gdf, cov_df, radio_metros=15)
+    gdf = asignar_cobertura_promedio_por_radio(gdf, cov_df, radio_metros=10)
 
     # Clasificar señal
     gdf["Gateway"] = gdf["dBm"].apply(classify_signal)
