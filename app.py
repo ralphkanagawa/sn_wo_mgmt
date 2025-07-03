@@ -150,7 +150,7 @@ with tab1:
 
     st.markdown(
         "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
-        "Desarrollado en Streamlit • Última actualización: 2025-07-03"
+        "Desarrollado en Streamlit por CM SALVI • Última actualización: 2025-07-03"
         "</div>",
         unsafe_allow_html=True
     )
@@ -334,7 +334,7 @@ with tab2:
 
     st.markdown(
         "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
-        "Desarrollado en Streamlit • Última actualización: 2025-07-03"
+        "Desarrollado en Streamlit en CM SALVI • Última actualización: 2025-07-03"
         "</div>",
         unsafe_allow_html=True
     )
