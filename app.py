@@ -74,7 +74,7 @@ with tab1:
     )
     st.session_state.latest_edited = edited.copy()
 
-    col_spacer, col1, col2, col3, col_spacer = st.columns(5)
+    col_spacer, col1, col_spacer, col2, col_spacer, col3, col_spacer = st.columns(7)
 
     with col1:
         st.write("➕ Añadir datos en bloque")
