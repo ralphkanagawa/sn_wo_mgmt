@@ -196,14 +196,6 @@ with tab2:
 
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
 
-        legend_patches = [
-            mpatches.Patch(color="#009933", label="Buena cobertura (≥ -69 dBm)"),
-            mpatches.Patch(color="#FFA500", label="Cobertura media (-70 a -80 dBm)"),
-            mpatches.Patch(color="#FF0000", label="Poca cobertura (< -81 dBm)"),
-            mpatches.Patch(color="lightgray", label="Sin datos")
-        ]
-        ax.legend(handles=legend_patches, loc="lower left")
-
         col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
     
         with col1:
