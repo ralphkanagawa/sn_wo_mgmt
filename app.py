@@ -54,7 +54,7 @@ with tab1:
     disp = disp[template_cols]
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
-    col_left, col_spacer, col_right = st.columns([2, 13, 2])
+    col_left, col_spacer, col_right = st.columns([2, 12, 2])
 
     with col_left:
         if st.button("🔁 Volver a cargar archivos"):
