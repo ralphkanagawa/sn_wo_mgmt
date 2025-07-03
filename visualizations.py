@@ -77,4 +77,4 @@ def render_map():
         "style": {"color": "white"},
     }
 
-    st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=init_view_state, tooltip=tooltip, map_style="mapbox://styles/mapbox/satellite-v9"), height=700)
+    st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=init_view_state, tooltip=tooltip, map_style=None), height=700)
