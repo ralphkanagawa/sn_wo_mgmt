@@ -77,4 +77,15 @@ def render_map():
         "style": {"color": "white"},
     }
 
-    st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=init_view_state, tooltip=tooltip, map_style=None), height=700)
+    # Mostrar el mapa centrado en columna central
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col2:
+        st.pydeck_chart(
+            pdk.Deck(
+                layers=layers,
+                initial_view_state=init_view_state,
+                tooltip=tooltip,
+                map_style=None  # O puedes poner un estilo Mapbox si tienes token
+            ),
+            height=700
+        )
