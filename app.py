@@ -231,6 +231,9 @@ with tab2:
         with open(output_path, "wb") as f:
             pisa.CreatePDF(html, dest=f)
 
+    def safe_unique(df, col):
+        return df[col].dropna().unique().tolist() if col in df.columns else []
+    
     if st.session_state.edited_df.empty:
         st.warning("No hay datos disponibles. Por favor, carga y edita datos en la pestaña anterior.")
     else:
@@ -242,76 +245,73 @@ with tab2:
         with col2:
             st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
 
-def safe_unique(df, col):
-    return df[col].dropna().unique().tolist() if col in df.columns else []
-
-    if st.button("📄 Generar informe PDF"):
-        df_full = st.session_state.df.copy()
-    
-        # Añadir columnas complementarias desde la edición manual
-        cols_complementarias = [
-            "Name - Parent Functional Location",
-            "Name - Child Functional Location",
-            "Incident Type - Work Order",
-            "Owner - Work Order",
-            "Name - Bookable Resource Booking"
-        ]
-        edited_df = st.session_state.edited_df.copy()
-        for col in cols_complementarias:
-            if col in edited_df.columns:
-                df_full[col] = edited_df[col]
-    
-        # Guardar mapa con cobertura
-        save_geoposition_map(df_full, "map_contextual.png")
-    
-        # Obtener calles a partir de coordenadas
-        df_full["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
-            df_full,
-            "Latitude - Functional Location",
-            "Longitude - Functional Location"
-        )
-        calles_validas = df_full["Calle (por coordenadas)"].dropna()
-        calles_unicas = calles_validas.unique().tolist()
-        ordenes_por_calle = calles_validas.value_counts().to_dict()
-    
-        # Métricas del resumen
-        total_ordenes = len(df_full)
-        total_yes = (df_full["Gateway"] == "YES").sum()
-        total_no = (df_full["Gateway"] == "NO").sum()
-    
-        # Nuevos conteos por categoría
-        incident_type_counts = df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict()
-        owner_counts = df_full["Owner - Work Order"].value_counts(dropna=True).to_dict()
-        resource_counts = df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict()
-        parent_location_counts = df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict()
-        child_location_counts = df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict()
-    
-    
-        context = {
-            "fecha": datetime.now().strftime("%d/%m/%Y"),
-            "total_ordenes": total_ordenes,
-            "total_yes": total_yes,
-            "total_no": total_no,
-            "parent_locations": parent_locations,
-            "child_locations": child_locations,
-            "calles": calles_unicas,
-            "ordenes_por_calle": ordenes_por_calle,
-            "incident_types": incident_types,
-            "owners": owners,
-            "resources": resources,
-            "incident_type_counts": incident_type_counts,
-            "owner_counts": owner_counts,
-            "resource_counts": resource_counts,
-            "parent_location_counts": parent_location_counts,
-            "child_location_counts": child_location_counts,
-        }
-    
-    
-        render_pdf("report_template.html", context, "informe.pdf")
-        with open("informe.pdf", "rb") as f:
-            st.download_button(
-                "⬇️ Descargar informe PDF",
-                data=f,
-                file_name="informe.pdf",
-                mime="application/pdf"
+        if st.button("📄 Generar informe PDF"):
+            df_full = st.session_state.df.copy()
+        
+            # Añadir columnas complementarias desde la edición manual
+            cols_complementarias = [
+                "Name - Parent Functional Location",
+                "Name - Child Functional Location",
+                "Incident Type - Work Order",
+                "Owner - Work Order",
+                "Name - Bookable Resource Booking"
+            ]
+            edited_df = st.session_state.edited_df.copy()
+            for col in cols_complementarias:
+                if col in edited_df.columns:
+                    df_full[col] = edited_df[col]
+        
+            # Guardar mapa con cobertura
+            save_geoposition_map(df_full, "map_contextual.png")
+        
+            # Obtener calles a partir de coordenadas
+            df_full["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
+                df_full,
+                "Latitude - Functional Location",
+                "Longitude - Functional Location"
             )
+            calles_validas = df_full["Calle (por coordenadas)"].dropna()
+            calles_unicas = calles_validas.unique().tolist()
+            ordenes_por_calle = calles_validas.value_counts().to_dict()
+        
+            # Métricas del resumen
+            total_ordenes = len(df_full)
+            total_yes = (df_full["Gateway"] == "YES").sum()
+            total_no = (df_full["Gateway"] == "NO").sum()
+        
+            # Nuevos conteos por categoría
+            incident_type_counts = df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict()
+            owner_counts = df_full["Owner - Work Order"].value_counts(dropna=True).to_dict()
+            resource_counts = df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict()
+            parent_location_counts = df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict()
+            child_location_counts = df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict()
+        
+        
+            context = {
+                "fecha": datetime.now().strftime("%d/%m/%Y"),
+                "total_ordenes": total_ordenes,
+                "total_yes": total_yes,
+                "total_no": total_no,
+                "parent_locations": parent_locations,
+                "child_locations": child_locations,
+                "calles": calles_unicas,
+                "ordenes_por_calle": ordenes_por_calle,
+                "incident_types": incident_types,
+                "owners": owners,
+                "resources": resources,
+                "incident_type_counts": incident_type_counts,
+                "owner_counts": owner_counts,
+                "resource_counts": resource_counts,
+                "parent_location_counts": parent_location_counts,
+                "child_location_counts": child_location_counts,
+            }
+        
+        
+            render_pdf("report_template.html", context, "informe.pdf")
+            with open("informe.pdf", "rb") as f:
+                st.download_button(
+                    "⬇️ Descargar informe PDF",
+                    data=f,
+                    file_name="informe.pdf",
+                    mime="application/pdf"
+                )
