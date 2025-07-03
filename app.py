@@ -187,9 +187,9 @@ with tab2:
 
         if not df_with.empty:
             def color_for_dbm(dbm):
-                if dbm >= -70:
+                if dbm >= -69:
                     return "#009933"  # verde
-                elif -80 <= dbm < -70:
+                elif -80 <= dbm < -69:
                     return "#FFA500"  # naranja
                 elif dbm < -80:
                     return "#FF0000"  # rojo
