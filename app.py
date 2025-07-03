@@ -174,25 +174,25 @@ with tab2:
             )
 
         if not df_with.empty:
-        def color_for_dbm(dbm):
-            if dbm >= -70:
-                return "#009933"  # verde
-            elif -80 <= dbm < -70:
-                return "#FFA500"  # naranja
-            elif dbm < -80:
-                return "#FF0000"  # rojo
-            return "lightgray"
-        
-        colors = df_with["dBm"].apply(color_for_dbm)
-        
-        ax.scatter(
-            df_with["Longitude - Functional Location"],
-            df_with["Latitude - Functional Location"],
-            color=colors,
-            s=60,
-            alpha=0.9,
-            edgecolors="black"
-        )
+            def color_for_dbm(dbm):
+                if dbm >= -70:
+                    return "#009933"  # verde
+                elif -80 <= dbm < -70:
+                    return "#FFA500"  # naranja
+                elif dbm < -80:
+                    return "#FF0000"  # rojo
+                return "lightgray"
+            
+            colors = df_with["dBm"].apply(color_for_dbm)
+            
+            ax.scatter(
+                df_with["Longitude - Functional Location"],
+                df_with["Latitude - Functional Location"],
+                color=colors,
+                s=60,
+                alpha=0.9,
+                edgecolors="black"
+            )
 
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
 
