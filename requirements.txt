@@ -7,3 +7,6 @@ jinja2
 xhtml2pdf
 contextily
 geopy
+scipy>=1.10
+numpy>=1.23
+
