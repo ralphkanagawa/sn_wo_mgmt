@@ -4,8 +4,8 @@ import streamlit as st
 
 def color_from_dbm(v):
     if pd.isna(v):
-        return [255, 255, 255]
-    if v >= -70:
+        return [0, 0, 0]
+    if v >= -69:
         return [0, 153, 51]
     if -80 <= v < -70:
         return [255, 165, 0]
