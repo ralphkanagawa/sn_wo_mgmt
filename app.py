@@ -143,9 +143,10 @@ with tab1:
         st.markdown("🔴 **Insuficiente**", unsafe_allow_html=True)
     with col4:
         st.markdown("⚪ **Sin datos**", unsafe_allow_html=True)
+        
+    col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
     
     render_map()
-    col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
 
     st.caption("Desarrollado en Streamlit • Última actualización: 2025-07-03")
 
