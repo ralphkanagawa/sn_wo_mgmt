@@ -1,11 +1,11 @@
 import pandas as pd
 import streamlit as st
+import numpy as np
+from scipy.spatial import cKDTree
 from utils import classify_signal
 
-from scipy.spatial import cKDTree
-import numpy as np
 
-def asignar_cobertura_por_proximidad(geo_df, cov_df, max_dist_metros=10):
+def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=10):
     def latlon_to_cartesian(lat, lon):
         R = 6371000  # radio de la Tierra en metros
         phi = np.radians(lat)
@@ -15,21 +15,33 @@ def asignar_cobertura_por_proximidad(geo_df, cov_df, max_dist_metros=10):
         z = R * np.sin(phi)
         return np.vstack((x, y, z)).T
 
-    geo_coords = latlon_to_cartesian(geo_df["Latitude - Functional Location"], geo_df["Longitude - Functional Location"])
-    cov_coords = latlon_to_cartesian(cov_df["Latitud"], cov_df["Longitud"])
+    # Convertir coordenadas a cartesianas
+    geo_coords = latlon_to_cartesian(
+        geo_df["Latitude - Functional Location"],
+        geo_df["Longitude - Functional Location"]
+    )
+    cov_coords = latlon_to_cartesian(
+        cov_df["Latitud"],
+        cov_df["Longitud"]
+    )
 
     tree = cKDTree(cov_coords)
-    distancias, indices = tree.query(geo_coords, distance_upper_bound=max_dist_metros)
+    vecinos_por_punto = tree.query_ball_point(geo_coords, r=radio_metros)
 
-    rssi = []
-    for d, idx in zip(distancias, indices):
-        if idx < len(cov_df):
-            rssi.append(cov_df.iloc[idx]["RSSI / RSCP (dBm)"])
+    medias = []
+    for vecinos in vecinos_por_punto:
+        if vecinos:
+            valores = cov_df.iloc[vecinos]["RSSI / RSCP (dBm)"].dropna().tolist()
+            if valores:
+                medias.append(np.mean(valores))
+            else:
+                medias.append(None)
         else:
-            rssi.append(None)
+            medias.append(None)
 
-    geo_df["dBm"] = rssi
+    geo_df["dBm"] = medias
     return geo_df
+
 
 def load_and_process_files(geo_file, cov_file, config):
     geo_df = pd.read_csv(geo_file)
@@ -42,20 +54,27 @@ def load_and_process_files(geo_file, cov_file, config):
         st.error("Coverage debe tener Latitud, Longitud y RSSI / RSCP (dBm)")
         st.stop()
 
+    # Renombrar y añadir columnas necesarias
     gdf = geo_df.rename(columns={
         "Latitud": "Latitude - Functional Location",
         "Longitud": "Longitude - Functional Location",
     })
-
     gdf["Service Account - Work Order"] = "ANER_Senegal"
     gdf["Billing Account - Work Order"] = "ANER_Senegal"
     gdf["Work Order Type - Work Order"] = "Installation"
 
-    gdf = asignar_cobertura_por_proximidad(gdf, cov_df)
+    # Asignar cobertura por promedio en radio
+    gdf = asignar_cobertura_promedio_por_radio(gdf, cov_df, radio_metros=10)
+
+    # Clasificar señal
     gdf["Gateway"] = gdf["dBm"].apply(classify_signal)
 
-
+    # Guardar en estado
     st.session_state.df = gdf.copy()
     st.session_state.geo_df = geo_df.copy()
     st.session_state.cov_df = cov_df.copy()
     st.session_state.processed = True
+
+    puntos_con_cobertura = gdf["dBm"].notna().sum()
+    total_puntos = len(gdf)
+    st.info(f"Cobertura vinculada con → {puntos_con_cobertura} de {total_puntos} puntos (media en radio de 10 metros)")
