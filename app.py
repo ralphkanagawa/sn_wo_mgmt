@@ -323,4 +323,10 @@ with tab2:
                     mime="application/pdf"
                 )
 
-    st.caption("Desarrollado en Streamlit • Última actualización: 2025-07-03")
+    st.markdown(
+        "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
+        "Desarrollado en Streamlit • Última actualización: 2025-07-03"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
