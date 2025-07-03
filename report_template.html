@@ -83,10 +83,41 @@
         {% endfor %}
     </ul>
 
-    <p><strong>Tipos de incidente:</strong> {{ incident_types | join(', ') }}</p>
-    <p><strong>Propietarios (Owner):</strong> {{ owners | join(', ') }}</p>
-    <p><strong>Equipos asignados (Bookable Resource Booking):</strong> {{ resources | join(', ') }}</p>
-
+        <p><strong>Tipos de incidente:</strong></p>
+    <ul>
+        {% for tipo, count in incident_type_counts.items() %}
+            <li>{{ tipo }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+    
+    <p><strong>Propietarios (Owner):</strong></p>
+    <ul>
+        {% for owner, count in owner_counts.items() %}
+            <li>{{ owner }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+    
+    <p><strong>Equipos asignados (Bookable Resource Booking):</strong></p>
+    <ul>
+        {% for resource, count in resource_counts.items() %}
+            <li>{{ resource }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+    
+    <p><strong>Órdenes por localidad padre:</strong></p>
+    <ul>
+        {% for loc, count in parent_location_counts.items() %}
+            <li>{{ loc }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+    
+    <p><strong>Órdenes por localidad hijo:</strong></p>
+    <ul>
+        {% for loc, count in child_location_counts.items() %}
+            <li>{{ loc }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+    
     <footer>
         Desarrollado por CM Salvi con tecnología Streamlit
     </footer>
