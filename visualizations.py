@@ -67,7 +67,7 @@ def render_map():
         init_view_state = pdk.ViewState(
             latitude=geo_points["lat"].mean(),
             longitude=geo_points["lon"].mean(),
-            zoom=15,
+            zoom=16,
         )
     else:
         init_view_state = pdk.ViewState(latitude=0, longitude=0, zoom=2)
