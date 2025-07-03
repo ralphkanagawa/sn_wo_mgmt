@@ -149,7 +149,7 @@ with tab1:
 
 # --- TAB 2: Generación del Informe PDF ---
 with tab2:
-    st.markdown("### Generación de informe PDF")
+    #st.markdown("### Generación de informe PDF")
 
     from jinja2 import Template
     from xhtml2pdf import pisa
