@@ -54,7 +54,7 @@ with tab1:
     disp = disp[template_cols]
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
-    col_left, col_spacer, col_right = st.columns([2, 6, 2])
+    col_left, col_spacer, col_right = st.columns([2, 8, 2])
 
     with col_left:
         if st.button("🔁 Volver a cargar archivos"):
@@ -74,7 +74,7 @@ with tab1:
     )
     st.session_state.latest_edited = edited.copy()
 
-    col1, col2, col3 = st.columns(3)
+    col1, col_spacer, col2, col_spacer, col3 = st.columns(5)
 
     with col1:
         st.write("➕ Añadir datos en bloque")
