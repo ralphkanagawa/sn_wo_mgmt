@@ -260,7 +260,7 @@ with tab2:
         with col2:
             st.image("map_contextual.png", use_container_width=True)
 
-        b1, b2, b3 = st.columns([6, 2, 4])
+        b1, b2, b3 = st.columns([5, 2, 4])
         with b2:
             if st.button("📄 Generar informe PDF"):
                 df_full = st.session_state.df.copy()
