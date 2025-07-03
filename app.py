@@ -198,7 +198,7 @@ with tab2:
 
         legend_patches = [
             mpatches.Patch(color="#009933", label="Buena cobertura (≥ -69 dBm)"),
-            mpatches.Patch(color="#FFA500", label="Cobertura media (-80 a -70 dBm)"),
+            mpatches.Patch(color="#FFA500", label="Cobertura media (-70 a -80 dBm)"),
             mpatches.Patch(color="#FF0000", label="Poca cobertura (< -80 dBm)"),
             mpatches.Patch(color="lightgray", label="Sin datos")
         ]
