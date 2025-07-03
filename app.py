@@ -279,11 +279,13 @@ if st.button("📄 Generar informe PDF"):
     total_yes = (df_full["Gateway"] == "YES").sum()
     total_no = (df_full["Gateway"] == "NO").sum()
 
-    parent_locations = safe_unique(df_full, "Name - Parent Functional Location")
-    child_locations = safe_unique(df_full, "Name - Child Functional Location")
-    incident_types = safe_unique(df_full, "Incident Type - Work Order")
-    owners = safe_unique(df_full, "Owner - Work Order")
-    resources = safe_unique(df_full, "Name - Bookable Resource Booking")
+    # Nuevos conteos por categoría
+    incident_type_counts = df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict()
+    owner_counts = df_full["Owner - Work Order"].value_counts(dropna=True).to_dict()
+    resource_counts = df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict()
+    parent_location_counts = df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict()
+    child_location_counts = df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict()
+
 
     context = {
         "fecha": datetime.now().strftime("%d/%m/%Y"),
@@ -297,7 +299,13 @@ if st.button("📄 Generar informe PDF"):
         "incident_types": incident_types,
         "owners": owners,
         "resources": resources,
+        "incident_type_counts": incident_type_counts,
+        "owner_counts": owner_counts,
+        "resource_counts": resource_counts,
+        "parent_location_counts": parent_location_counts,
+        "child_location_counts": child_location_counts,
     }
+
 
     render_pdf("report_template.html", context, "informe.pdf")
     with open("informe.pdf", "rb") as f:
