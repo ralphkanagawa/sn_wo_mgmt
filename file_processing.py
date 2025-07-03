@@ -5,7 +5,7 @@ from scipy.spatial import cKDTree
 from utils import classify_signal
 
 
-def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=10):
+def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15):
     def latlon_to_cartesian(lat, lon):
         R = 6371000  # radio de la Tierra en metros
         phi = np.radians(lat)
