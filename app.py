@@ -133,9 +133,8 @@ with tab1:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-    render_map()
-    col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
-    
+    st.markdown("---")
+      
     with col1:
         st.markdown("🟢 **Buena**", unsafe_allow_html=True)
     with col2:
@@ -144,6 +143,9 @@ with tab1:
         st.markdown("🔴 **Insuficiente**", unsafe_allow_html=True)
     with col4:
         st.markdown("⚪ **Sin datos**", unsafe_allow_html=True)
+    
+    render_map()
+    col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
 
     st.caption("Desarrollado en Streamlit • Última actualización: 2025-07-03")
 
