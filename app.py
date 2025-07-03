@@ -248,7 +248,7 @@ with tab2:
         
         with col2:
             st.image("map_contextual.png", use_container_width=True)
-            col_spacer, col1, col2, col3, col4, col_spacer, = st.columns(8)
+            col_spacer, col1, col2, col3, col4, col_spacer, = st.columns(6)
     
             with col1:
                 st.markdown("🟢 **Buena**", unsafe_allow_html=True)
