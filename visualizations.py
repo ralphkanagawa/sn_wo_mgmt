@@ -50,7 +50,7 @@ def render_map():
             get_position="[lon, lat]",
             get_radius=5,
             get_fill_color="color",
-            opacity=0.2,
+            opacity=0.1,
             pickable=True,
         ),
         pdk.Layer(
