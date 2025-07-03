@@ -158,7 +158,7 @@ with tab2:
     import matplotlib.patches as mpatches
 
     def save_geoposition_map(df, path="map_contextual.png"):
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(10, 5))
 
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
