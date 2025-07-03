@@ -145,7 +145,7 @@ with tab1:
     with col4:
         st.markdown("⚪ **Sin datos**", unsafe_allow_html=True)
 
-    st.caption("Desarrollado en Streamlit • Última actualización: 2025-06-30")
+    st.caption("Desarrollado en Streamlit • Última actualización: 2025-07-03")
 
 # --- TAB 2: Generación del Informe PDF ---
 with tab2:
@@ -316,3 +316,5 @@ with tab2:
                     file_name="informe.pdf",
                     mime="application/pdf"
                 )
+
+    st.caption("Desarrollado en Streamlit • Última actualización: 2025-07-03")
