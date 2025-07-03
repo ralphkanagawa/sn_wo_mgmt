@@ -258,7 +258,7 @@ with tab2:
         col1, col2, col3 = st.columns([1, 2, 1])  # columna central más ancha
         
         with col2:
-            st.image("map_contextual.png", caption="Mapa de cobertura (base OSM)", use_container_width=True)
+            st.image("map_contextual.png", use_container_width=True)
 
         if st.button("📄 Generar informe PDF"):
             df_full = st.session_state.df.copy()
