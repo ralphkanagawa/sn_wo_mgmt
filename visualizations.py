@@ -43,7 +43,10 @@ def render_map():
             tooltip="Haz clic para seleccionar",
         ).add_to(m)
 
-    map_data = st_folium(m, width=1000, height=600)
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col2:
+        map_data = st_folium(m, width=900, height=600)
+
 
     if map_data and map_data.get("last_clicked"):
         clicked = map_data["last_clicked"]
