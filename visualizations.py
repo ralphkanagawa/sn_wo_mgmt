@@ -1,5 +1,4 @@
 import folium
-from folium.plugins import MarkerCluster
 from streamlit_folium import st_folium
 import pandas as pd
 import streamlit as st
@@ -16,7 +15,6 @@ def render_map():
     lon_center = df["Longitude - Functional Location"].mean()
 
     m = folium.Map(location=[lat_center, lon_center], zoom_start=14)
-    marker_cluster = MarkerCluster().add_to(m)
 
     def color_from_dbm(dBm):
         if pd.isna(dBm):
@@ -43,9 +41,8 @@ def render_map():
             fill_opacity=0.9,
             popup=f"ID: {row_id} | dBm: {dbm}",
             tooltip="Haz clic para seleccionar",
-        ).add_to(marker_cluster)
+        ).add_to(m)
 
-    # Mostrar el mapa y capturar interacción del clic
     map_data = st_folium(m, width=1000, height=600)
 
     if map_data and map_data.get("last_clicked"):
