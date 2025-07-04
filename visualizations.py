@@ -1,91 +1,62 @@
-import pydeck as pdk
+import folium
+from folium.plugins import MarkerCluster
+from streamlit_folium import st_folium
 import pandas as pd
 import streamlit as st
 
-def color_from_dbm(v):
-    if pd.isna(v):
-        return [0, 0, 0]
-    if v >= -69:
-        return [0, 153, 51]
-    if -80 <= v < -70:
-        return [255, 165, 0]
-    return [255, 0, 0]
-
 def render_map():
-    if "latest_edited" not in st.session_state:
+    if "latest_edited" not in st.session_state or st.session_state.latest_edited.empty:
         return
 
-    geo_points = (
-        st.session_state.latest_edited[[
-            "Latitude - Functional Location",
-            "Longitude - Functional Location",
-            "dBm",
-        ]]
-       .dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"])
-        .copy()
-    )
-    geo_points.rename(columns={
-        "Latitude - Functional Location": "lat",
-        "Longitude - Functional Location": "lon",
-        "dBm": "coverage",
-    }, inplace=True)
-    geo_points["color"] = geo_points["coverage"].apply(color_from_dbm)
+    df = st.session_state.latest_edited.copy()
+    df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"]).reset_index(drop=True)
+    df["row_id"] = df.index  # Para poder identificar la fila
 
-    cov_points = (
-        st.session_state.cov_df[["Latitud", "Longitud", "RSSI / RSCP (dBm)"]]
-        .dropna()
-        .copy()
-    )
-    cov_points.rename(columns={
-        "Latitud": "lat",
-        "Longitud": "lon",
-        "RSSI / RSCP (dBm)": "coverage",
-    }, inplace=True)
-    cov_points["color"] = [[128, 128, 128]] * len(cov_points)
+    # Crear mapa centrado en el centro de los puntos
+    lat_center = df["Latitude - Functional Location"].mean()
+    lon_center = df["Longitude - Functional Location"].mean()
 
-    layers = [
-        pdk.Layer(
-            "ScatterplotLayer",
-            data=cov_points,
-            get_position="[lon, lat]",
-            get_radius=5,
-            get_fill_color="color",
-            opacity=0.1,
-            pickable=True,
-        ),
-        pdk.Layer(
-            "ScatterplotLayer",
-            data=geo_points,
-            get_position="[lon, lat]",
-            get_radius=4,
-            get_fill_color="color",
-            pickable=True,
-        ),
-    ]
+    m = folium.Map(location=[lat_center, lon_center], zoom_start=14)
+    marker_cluster = MarkerCluster().add_to(m)
 
-    if not geo_points.empty:
-        init_view_state = pdk.ViewState(
-            latitude=geo_points["lat"].mean(),
-            longitude=geo_points["lon"].mean(),
-            zoom=16,
-        )
-    else:
-        init_view_state = pdk.ViewState(latitude=0, longitude=0, zoom=2)
+    def color_from_dbm(dBm):
+        if pd.isna(dBm):
+            return "lightgray"
+        if dBm >= -69:
+            return "green"
+        elif -80 <= dBm < -69:
+            return "orange"
+        else:
+            return "red"
 
-    tooltip = {
-        "html": "<b>dBm:</b> {coverage}",
-        "style": {"color": "white"},
-    }
+    for _, row in df.iterrows():
+        lat = row["Latitude - Functional Location"]
+        lon = row["Longitude - Functional Location"]
+        dbm = row.get("dBm", None)
+        row_id = row["row_id"]
 
-    # Mostrar el mapa centrado en columna central
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
-        st.pydeck_chart(
-            pdk.Deck(
-                layers=layers,
-                initial_view_state=init_view_state,
-                tooltip=tooltip,
-                map_style=None  # O puedes poner un estilo Mapbox si tienes token
-            ),
-            height=700
-        )
+        folium.CircleMarker(
+            location=[lat, lon],
+            radius=6,
+            color="black",
+            fill=True,
+            fill_color=color_from_dbm(dbm),
+            fill_opacity=0.9,
+            popup=f"ID: {row_id} | dBm: {dbm}",
+            tooltip="Haz clic para seleccionar",
+        ).add_to(marker_cluster)
+
+    # Mostrar el mapa y capturar interacción
+    map_data = st_folium(m, width=1000, height=600)
+
+    if map_data and map_data.get("last_object_clicked_tooltip"):
+        clicked = map_data.get("last_clicked")
+        if clicked:
+            lat, lon = clicked["lat"], clicked["lng"]
+            match = df[
+                (df["Latitude - Functional Location"].sub(lat).abs() < 0.0001) &
+                (df["Longitude - Functional Location"].sub(lon).abs() < 0.0001)
+            ]
+            if not match.empty:
+                selected_idx = match.iloc[0]["row_id"]
+                st.session_state["selected_row_id"] = selected_idx
