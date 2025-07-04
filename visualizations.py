@@ -37,6 +37,14 @@ def render_map():
         dbm = row.get("dBm", None)
         row_id = row["row_id"]
 
+        # Añadir marcador invisible para mejorar detección del clic
+        folium.Marker(
+            location=[lat, lon],
+            icon=folium.DivIcon(html=""),  # invisible
+            tooltip=f"ID punto: {row.get('ID punto', row_id)}"
+        ).add_to(m)
+
+        # Añadir marcador visual para color
         folium.CircleMarker(
             location=[lat, lon],
             radius=6,
@@ -45,8 +53,8 @@ def render_map():
             fill_color=color_from_dbm(dbm),
             fill_opacity=0.9,
             popup=f"ID punto: {row.get('ID punto', row_id)} | dBm: {dbm}",
-            tooltip="Haz clic para seleccionar",
         ).add_to(m)
+
 
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
