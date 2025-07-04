@@ -12,7 +12,6 @@ def render_map():
     df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"]).reset_index(drop=True)
     df["row_id"] = df.index  # Para poder identificar la fila
 
-    # Crear mapa centrado en el centro de los puntos
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
@@ -46,17 +45,16 @@ def render_map():
             tooltip="Haz clic para seleccionar",
         ).add_to(marker_cluster)
 
-    # Mostrar el mapa y capturar interacción
+    # Mostrar el mapa y capturar interacción del clic
     map_data = st_folium(m, width=1000, height=600)
 
-    if map_data and map_data.get("last_object_clicked_tooltip"):
-        clicked = map_data.get("last_clicked")
-        if clicked:
-            lat, lon = clicked["lat"], clicked["lng"]
-            match = df[
-                (df["Latitude - Functional Location"].sub(lat).abs() < 0.0001) &
-                (df["Longitude - Functional Location"].sub(lon).abs() < 0.0001)
-            ]
-            if not match.empty:
-                selected_idx = match.iloc[0]["row_id"]
-                st.session_state["selected_row_id"] = selected_idx
+    if map_data and map_data.get("last_clicked"):
+        clicked = map_data["last_clicked"]
+        lat, lon = clicked["lat"], clicked["lng"]
+        match = df[
+            (df["Latitude - Functional Location"].sub(lat).abs() < 0.0001) &
+            (df["Longitude - Functional Location"].sub(lon).abs() < 0.0001)
+        ]
+        if not match.empty:
+            selected_idx = match.iloc[0]["row_id"]
+            st.session_state["selected_row_id"] = selected_idx
