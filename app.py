@@ -73,6 +73,7 @@ with tab1:
         key="editor"
     )
 
+
         # 🔎 Resaltar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
         selected_id = st.session_state["selected_row_id"]
