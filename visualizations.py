@@ -12,11 +12,11 @@ def color_from_dbm(v):
     return [255, 0, 0]
 
 def render_map():
-    if "edited_df" not in st.session_state:
+    if "latest_edited" not in st.session_state:
         return
 
     geo_points = (
-        st.session_state.edited_df[[
+        st.session_state.latest_edited[[
             "Latitude - Functional Location",
             "Longitude - Functional Location",
             "dBm",
