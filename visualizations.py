@@ -11,6 +11,11 @@ def render_map():
     df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"]).reset_index(drop=True)
     df["row_id"] = df.index  # Para poder identificar la fila
 
+    # Intentar usar columna de ID punto si existe
+    if "ID punto" in df.columns:
+        df["row_id"] = df["ID punto"] - 1  # Para alinear con el índice real
+
+
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
@@ -39,7 +44,7 @@ def render_map():
             fill=True,
             fill_color=color_from_dbm(dbm),
             fill_opacity=0.9,
-            popup=f"ID: {row_id} | dBm: {dbm}",
+            popup=f"ID punto: {row.get('ID punto', row_id)} | dBm: {dbm}",
             tooltip="Haz clic para seleccionar",
         ).add_to(m)
 
