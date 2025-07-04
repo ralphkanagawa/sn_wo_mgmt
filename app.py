@@ -48,10 +48,16 @@ with tab1:
             st.stop()
 
     disp = st.session_state.df.copy()
+
+    # Añadir columna 'ID punto' si no existe
+    if "ID punto" not in disp.columns:
+        disp.insert(0, "ID punto", range(1, len(disp) + 1))
+    
     for c in template_cols:
         if c not in disp.columns:
             disp[c] = ""
-    disp = disp[template_cols]
+    disp = disp[["ID punto"] + [col for col in template_cols if col != "ID punto"]]
+
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
     col_left, col_spacer, col_right = st.columns([3, 12, 2])
