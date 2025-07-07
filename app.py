@@ -228,20 +228,20 @@ with tab2:
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
 
-#    def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
-#        geolocator = Nominatim(user_agent="cm_salvi_app")
-#        geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1, return_value_on_exception=None)
+    def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
+        geolocator = Nominatim(user_agent="cm_salvi_app")
+        geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1, return_value_on_exception=None)
     
-#        calles = []
-#        for _, row in df.iterrows():
-#            lat, lon = row[lat_col], row[lon_col]
-#            if pd.notna(lat) and pd.notna(lon):
-#                location = geocode((lat, lon), language="es")
-#                calle = location.raw["address"].get("road") if location else None
-#                calles.append(calle)
-#            else:
-#                calles.append(None)
-#        return calles
+        calles = []
+        for _, row in df.iterrows():
+            lat, lon = row[lat_col], row[lon_col]
+            if pd.notna(lat) and pd.notna(lon):
+                location = geocode((lat, lon), language="es")
+                calle = location.raw["address"].get("road") if location else None
+                calles.append(calle)
+            else:
+                calles.append(None)
+        return calles
 
 
     def render_pdf(template_path, context, output_path):
@@ -296,14 +296,14 @@ with tab2:
                 save_geoposition_map(df_full, "map_contextual.png")
             
                 # Obtener calles a partir de coordenadas
-#                df_full["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
-#                    df_full,
-#                    "Latitude - Functional Location",
-#                    "Longitude - Functional Location"
-#                )
-#                calles_validas = df_full["Calle (por coordenadas)"].dropna()
-#                calles_unicas = calles_validas.unique().tolist()
-#                ordenes_por_calle = calles_validas.value_counts().to_dict()
+                df_full["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
+                    df_full,
+                    "Latitude - Functional Location",
+                    "Longitude - Functional Location"
+                )
+                calles_validas = df_full["Calle (por coordenadas)"].dropna()
+                calles_unicas = calles_validas.unique().tolist()
+                ordenes_por_calle = calles_validas.value_counts().to_dict()
             
                 # Métricas del resumen
                 total_ordenes = len(df_full)
@@ -325,8 +325,8 @@ with tab2:
                     "total_no": total_no,
                     "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
                     "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
-                    #"calles": calles_unicas,
-                    #"ordenes_por_calle": ordenes_por_calle,
+                    "calles": calles_unicas,
+                    "ordenes_por_calle": ordenes_por_calle,
                     "incident_types": safe_unique(df_full, "Incident Type - Work Order"),
                     "owners": safe_unique(df_full, "Owner - Work Order"),
                     "resources": safe_unique(df_full, "Name - Bookable Resource Booking"),
