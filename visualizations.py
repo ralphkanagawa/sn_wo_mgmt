@@ -9,16 +9,17 @@ def render_map():
 
     df = st.session_state.latest_edited.copy()
     df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"]).reset_index(drop=True)
-    df["row_id"] = df.index
+    df["row_id"] = df.index  # Para poder identificar la fila
 
-    # Usar ID punto si existe
+    # Intentar usar columna de ID punto si existe
     if "ID punto" in df.columns:
-        df["row_id"] = df["ID punto"] - 1
+        df["row_id"] = df["ID punto"] - 1  # Para alinear con el índice real
+
 
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
-    m = folium.Map(location=[lat_center, lon_center], zoom_start=14)
+    m = folium.Map(location=[lat_center, lon_center], zoom_start=16)
 
     def color_from_dbm(dBm):
         if pd.isna(dBm):
@@ -35,19 +36,30 @@ def render_map():
         lon = row["Longitude - Functional Location"]
         dbm = row.get("dBm", None)
         row_id = row["row_id"]
-        icon_color = color_from_dbm(dbm)
 
+        # Añadir marcador invisible para mejorar detección del clic
         folium.Marker(
             location=[lat, lon],
-            icon=folium.Icon(color=icon_color, icon="info-sign"),
-            tooltip=f"ID punto: {row.get('ID punto', row_id)} | dBm: {dbm}",
+            icon=folium.DivIcon(html=""),  # invisible
+            tooltip=f"ID punto: {row.get('ID punto', row_id)}"
+        ).add_to(m)
+
+        # Añadir marcador visual para color
+        folium.CircleMarker(
+            location=[lat, lon],
+            radius=6,
+            color="black",
+            fill=True,
+            fill_color=color_from_dbm(dbm),
+            fill_opacity=0.9,
             popup=f"ID punto: {row.get('ID punto', row_id)} | dBm: {dbm}",
         ).add_to(m)
 
-    # Centrar el mapa visualmente en Streamlit
+
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
         map_data = st_folium(m, width=900, height=600)
+
 
     if map_data and map_data.get("last_clicked"):
         clicked = map_data["last_clicked"]
