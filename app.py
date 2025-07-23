@@ -11,7 +11,7 @@ from visualizations import render_map
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
-# Configuración de la página
+# Configuración de la página  #
 st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
 
 # Inicialización
