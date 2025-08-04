@@ -296,7 +296,7 @@ with tab2:
                 save_geoposition_map(df_full, "map_contextual.png")
             
                 # Obtener calles a partir de coordenadas
-                df_full["Calle (por coordenadas)"] = obtener_calles_por_geocodificacion(
+                df_full["Street (by coords)"] = obtener_calles_por_geocodificacion(
                     df_full,
                     "Latitude - Functional Location",
                     "Longitude - Functional Location"
