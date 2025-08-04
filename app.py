@@ -254,7 +254,7 @@ with tab2:
         return df[col].dropna().unique().tolist() if col in df.columns else []
     
     if st.session_state.edited_df.empty:
-        st.warning("No hay datos disponibles. Por favor, carga y edita datos en la pestaña anterior.")
+        st.warning("No data available. Please, load and edit on the Work Order Management tab.")
     else:
         df_full = st.session_state.df.copy()
         save_geoposition_map(df_full, "map_contextual.png")
@@ -266,17 +266,17 @@ with tab2:
             col_spacer, col1, col2, col3, col4, col_spacer, = st.columns(6)
     
             with col1:
-                st.markdown("🟢 **Buena**", unsafe_allow_html=True)
+                st.markdown("🟢 **Good**", unsafe_allow_html=True)
             with col2:
-                st.markdown("🟠 **Justa**", unsafe_allow_html=True)
+                st.markdown("🟠 **Enough**", unsafe_allow_html=True)
             with col3:
-                st.markdown("🔴 **Insuficiente**", unsafe_allow_html=True)
+                st.markdown("🔴 **Insufficient**", unsafe_allow_html=True)
             with col4:
-                st.markdown("⚪ **Sin datos**", unsafe_allow_html=True)
+                st.markdown("⚪ **No data**", unsafe_allow_html=True)
 
         b1, b2, b3 = st.columns([5, 2, 4])
         with b2:
-            if st.button("📄 Generar informe PDF"):
+            if st.button("📄 Generate Report PDF"):
                 df_full = st.session_state.df.copy()
             
                 # Añadir columnas complementarias desde la edición manual
@@ -301,7 +301,7 @@ with tab2:
                     "Latitude - Functional Location",
                     "Longitude - Functional Location"
                 )
-                calles_validas = df_full["Calle (por coordenadas)"].dropna()
+                calles_validas = df_full["Street (by coords)"].dropna()
                 calles_unicas = calles_validas.unique().tolist()
                 ordenes_por_calle = calles_validas.value_counts().to_dict()
             
@@ -340,7 +340,7 @@ with tab2:
                 render_pdf("report_template.html", context, "informe.pdf")
                 with open("informe.pdf", "rb") as f:
                     st.download_button(
-                        "⬇️ Descargar informe PDF",
+                        "⬇️ Download Report PDF",
                         data=f,
                         file_name="informe.pdf",
                         mime="application/pdf"
@@ -348,7 +348,7 @@ with tab2:
     
         st.markdown(
             "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
-            "Desarrollado en Streamlit en CM SALVI • Última actualización: 2025-07-03"
+            "Developed in Streamlit by CM SALVI • 2025"
             "</div>",
             unsafe_allow_html=True
         )
