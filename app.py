@@ -30,7 +30,7 @@ template_cols = load_excel_template_columns(config.excel_template_path)
 st.image("logotipo-salvi-2024.png", width=120)
 
 # Crear pestañas inferiores
-tab1, tab2 = st.tabs(["Gestión de órdenes", "Generar informe"])
+tab1, tab2 = st.tabs(["Work Order Management", "Report generator"])
 
 # TAB 1 - Todo el flujo actual
 with tab1:
@@ -50,26 +50,26 @@ with tab1:
     disp = st.session_state.df.copy()
 
     # Añadir columna 'ID punto' si no existe
-    if "ID punto" not in disp.columns:
-        disp.insert(0, "ID punto", range(1, len(disp) + 1))
+    if "ID point" not in disp.columns:
+        disp.insert(0, "ID point", range(1, len(disp) + 1))
     
     for c in template_cols:
         if c not in disp.columns:
             disp[c] = ""
-    disp = disp[["ID punto"] + [col for col in template_cols if col != "ID punto"]]
+    disp = disp[["ID point"] + [col for col in template_cols if col != "ID point"]]
 
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
     col_left, col_spacer, col_right = st.columns([3, 12, 2])
 
     with col_left:
-        if st.button("🔁 Volver a cargar archivos"):
+        if st.button("🔁 Reload files"):
             for key in ["processed", "df", "geo_df", "cov_df", "edited_df", "latest_edited"]:
                 st.session_state.pop(key, None)
             st.rerun()
 
     with col_right:
-        if st.button("💾 Guardar cambios"):
+        if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
 
     edited = st.data_editor(
@@ -83,7 +83,7 @@ with tab1:
         # 🔎 Resaltar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
         selected_id = st.session_state["selected_row_id"]
-        st.markdown(f"<span style='color:green;'>🟢 Punto seleccionado: fila {selected_id + 1}</span>", unsafe_allow_html=True)
+        st.markdown(f"<span style='color:green;'>🟢 Selected point: row {selected_id + 1}</span>", unsafe_allow_html=True)
     
         # Opcional: hacer scroll o marcar visualmente (Streamlit no permite highlight directo, pero puedes informar al usuario)
 
@@ -92,34 +92,34 @@ with tab1:
     col_spacer, col1, col_spacer, col2, col_spacer, col3, col_spacer = st.columns([2, 3, 2, 3, 2, 3, 2])
 
     with col1:
-        st.write("➕ Añadir datos en bloque")
+        st.write("➕ Add data")
         editable_cols = [c for c in edited.columns if c not in config.protected_columns]
-        col_sel = st.selectbox("Columna", editable_cols)
+        col_sel = st.selectbox("Column", editable_cols)
 
         val = ""
         if col_sel == "Name - Child Functional Location":
             parents = edited["Name - Parent Functional Location"].dropna().unique()
             par = parents[0] if len(parents) else None
             if par and par in config.parent_child_map:
-                val = st.selectbox("Valor hijo", config.parent_child_map[par])
+                val = st.selectbox("Child value", config.parent_child_map[par])
             else:
-                st.warning("Define primero 'Parent Functional Location'.")
+                st.warning("Define first 'Parent Functional Location'.")
         elif col_sel in config.dropdown_values:
             val = st.selectbox("Valor", config.dropdown_values[col_sel])
         else:
             val = st.text_input("Valor")
 
-        if st.button("📌 Aplicar valor"):
+        if st.button("📌 Apply value"):
             new_df = apply_bulk_value(st.session_state.latest_edited.copy(), col_sel, val)
             st.session_state.edited_df = new_df
             st.session_state.latest_edited = new_df.copy()
             st.rerun()
 
     with col2:
-        st.write("⏱️ Autocompletar fechas/horas")
-        d0 = st.date_input("Fecha inicial", value=date.today())
-        t0 = st.time_input("Hora inicial", value=datetime.now().time().replace(second=0, microsecond=0))
-        if st.button("🕒 Generar cada 27 min"):
+        st.write("⏱️ Autofill date/time")
+        d0 = st.date_input("Initial Date", value=date.today())
+        t0 = st.time_input("Initial Time", value=datetime.now().time().replace(second=0, microsecond=0))
+        if st.button("🕒 Generate each 27 min"):
             incs = generate_time_windows(d0, t0, len(st.session_state.latest_edited))
             new_df = fill_temporal_columns(st.session_state.latest_edited.copy(), incs)
             st.session_state.edited_df = new_df
@@ -127,8 +127,8 @@ with tab1:
             st.rerun()
 
     with col3:
-        st.write("💾 Descargar Excel")
-        if st.button("Generar Excel"):
+        st.write("💾 Download Excel")
+        if st.button("Generate Excel"):
             df_out = st.session_state.edited_df.copy()
             for c in template_cols:
                 if c not in df_out.columns:
@@ -142,7 +142,7 @@ with tab1:
 
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button(
-                "⬇️ Descargar Excel",
+                "⬇️ Download Excel",
                 data=buf,
                 file_name=f"workorders_{ts}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -153,19 +153,19 @@ with tab1:
     col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
     
     with col1:
-        st.markdown("🟢 **Buena**", unsafe_allow_html=True)
+        st.markdown("🟢 **Good**", unsafe_allow_html=True)
     with col2:
-        st.markdown("🟠 **Justa**", unsafe_allow_html=True)
+        st.markdown("🟠 **Enough**", unsafe_allow_html=True)
     with col3:
-        st.markdown("🔴 **Insuficiente**", unsafe_allow_html=True)
+        st.markdown("🔴 **Insufficient**", unsafe_allow_html=True)
     with col4:
-        st.markdown("⚪ **Sin datos**", unsafe_allow_html=True)
+        st.markdown("⚪ **No data**", unsafe_allow_html=True)
     
     render_map()
 
     st.markdown(
         "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
-        "Desarrollado en Streamlit por CM SALVI • Última actualización: 2025-07-03"
+        "Developed in Streamlit by CM SALVI • 2025"
         "</div>",
         unsafe_allow_html=True
     )
