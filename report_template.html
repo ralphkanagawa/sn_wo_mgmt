@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Informe de Órdenes de Trabajo</title>
+    <title>Work Orders Report</title>
 <style>
     body {
         font-family: 'Segoe UI', sans-serif;
@@ -57,61 +57,61 @@
     <header>
         <img src="logotipo-salvi-2024.png" alt="CM Salvi Logo">
         <div>
-            <h1>Informe de Órdenes de Trabajo</h1>
-            <p>Fecha de generación: {{ fecha }}</p>
+            <h1>Work orders report</h1>
+            <p>Date: {{ fecha }}</p>
         </div>
     </header>
 
     <!-- Mapa reducido y sin título -->
     <div class="map-section">
-        <img src="map_contextual.png" alt="Mapa de cobertura" style="width: 400px; height: auto; border: 1px solid #ccc;">
+        <img src="map_contextual.png" alt="Coverage map" style="width: 400px; height: auto; border: 1px solid #ccc;">
     </div>
 
-    <h2 class="section-title">Resumen</h2>
-    <p><strong>Total de órdenes:</strong> {{ total_ordenes }}</p>
-    <p><strong>Órdenes con cobertura (Gateway = YES):</strong> {{ total_yes }}</p>
-    <p><strong>Órdenes sin cobertura (Gateway = NO):</strong> {{ total_no }}</p>
+    <h2 class="section-title">Summary</h2>
+    <p><strong>Total orders:</strong> {{ total_ordenes }}</p>
+    <p><strong>Orders with coverage (Gateway = YES):</strong> {{ total_yes }}</p>
+    <p><strong>Orders without coverage (Gateway = NO):</strong> {{ total_no }}</p>
 
-    <p><strong>Localidades padre:</strong> {{ parent_locations | join(', ') }}</p>
-    <p><strong>Localidades hijo:</strong> {{ child_locations | join(', ') }}</p>
+    <p><strong>Parent Locations:</strong> {{ parent_locations | join(', ') }}</p>
+    <p><strong>Child Locations:</strong> {{ child_locations | join(', ') }}</p>
 
-    <p><strong>Calles con órdenes:</strong> {{ calles | join(', ') }}</p>
-    <p><strong>Órdenes por calle:</strong></p>
+    <p><strong>Streets with orders:</strong> {{ calles | join(', ') }}</p>
+    <p><strong>Orders per street:</strong></p>
     <ul>
         {% for calle, count in ordenes_por_calle.items() %}
             <li>{{ calle }}: {{ count }}</li>
         {% endfor %}
     </ul>
 
-        <p><strong>Tipos de incidente:</strong></p>
+        <p><strong>Incident types:</strong></p>
     <ul>
         {% for tipo, count in incident_type_counts.items() %}
             <li>{{ tipo }}: {{ count }}</li>
         {% endfor %}
     </ul>
     
-    <p><strong>Propietarios (Owner):</strong></p>
+    <p><strong>Owners:</strong></p>
     <ul>
         {% for owner, count in owner_counts.items() %}
             <li>{{ owner }}: {{ count }}</li>
         {% endfor %}
     </ul>
     
-    <p><strong>Equipos asignados (Bookable Resource Booking):</strong></p>
+    <p><strong>Bookable Resource Booking:</strong></p>
     <ul>
         {% for resource, count in resource_counts.items() %}
             <li>{{ resource }}: {{ count }}</li>
         {% endfor %}
     </ul>
     
-    <p><strong>Órdenes por localidad padre:</strong></p>
+    <p><strong>Orders by Parent Location:</strong></p>
     <ul>
         {% for loc, count in parent_location_counts.items() %}
             <li>{{ loc }}: {{ count }}</li>
         {% endfor %}
     </ul>
     
-    <p><strong>Órdenes por localidad hijo:</strong></p>
+    <p><strong>Orders by Child Location:</strong></p>
     <ul>
         {% for loc, count in child_location_counts.items() %}
             <li>{{ loc }}: {{ count }}</li>
@@ -119,7 +119,6 @@
     </ul>
     
     <footer>
-        Desarrollado por CM Salvi con tecnología Streamlit
     </footer>
 </body>
 </html>
