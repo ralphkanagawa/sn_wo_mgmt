@@ -12,3 +12,4 @@ numpy>=1.23
 folium
 streamlit-folium
 fastkml
+shapely
