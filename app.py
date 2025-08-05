@@ -130,15 +130,17 @@ with tab1:
         st.write("💾 Download Excel")
     
         if st.button("Generate Excel"):
-            # Validación estricta: todas las celdas en columnas requeridas deben estar rellenadas
             df_check = st.session_state.edited_df.copy()
-            missing_values = [
-                col for col in config.required_columns
-                if col in df_check.columns and df_check[col].isna().any()
-            ]
+    
+            # Verificación estricta: columnas requeridas deben estar completas (no NaN, no "", no espacios)
+            missing_values = []
+            for col in config.required_columns:
+                if col in df_check.columns:
+                    if df_check[col].apply(lambda x: pd.isna(x) or str(x).strip() == "").any():
+                        missing_values.append(col)
     
             if missing_values:
-                st.error(f"No se puede generar el Excel. Las siguientes columnas requeridas tienen celdas vacías: {', '.join(missing_values)}")
+                st.error(f"No se puede generar el Excel. Las siguientes columnas requeridas tienen valores vacíos: {', '.join(missing_values)}")
             else:
                 df_out = df_check.copy()
                 for c in template_cols:
@@ -158,6 +160,7 @@ with tab1:
                     file_name="Staging Dimensioned Records_Prod.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+
                 
     st.markdown("---")
 
