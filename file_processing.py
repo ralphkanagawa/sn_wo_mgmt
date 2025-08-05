@@ -36,7 +36,8 @@ def parse_kml_data(kml_bytes):
                 })
 
     # Ejecutar extracción correctamente
-    list(extract_placemarks(k.features()))
+    features = list(k.features())
+    list(extract_placemarks(features))
 
     return pd.DataFrame(placemarks)
 
