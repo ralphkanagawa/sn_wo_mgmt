@@ -128,17 +128,17 @@ with tab1:
 
     with col3:
         st.write("💾 Download Excel")
-        
-        #Valida columnas obligatorias
-        missing_values = [
-            col for col in config.required_columns
-            if col in st.session_state.edited_df.columns and st.session_state.edited_df[col].isna().all()
-        ]
-            
-        if missing_values:
-            st.warning(f"Las siguientes columnas requeridas están vacías: {', '.join(missing_values)}")
-        else:
-            if st.button("Generate Excel"):
+    
+        if st.button("Generate Excel"):
+            # Validación de columnas requeridas vacías
+            missing_values = [
+                col for col in config.required_columns
+                if col in st.session_state.edited_df.columns and st.session_state.edited_df[col].isna().all()
+            ]
+    
+            if missing_values:
+                st.warning(f"No se puede generar el Excel. Las siguientes columnas requeridas están vacías: {', '.join(missing_values)}")
+            else:
                 df_out = st.session_state.edited_df.copy()
                 for c in template_cols:
                     if c not in df_out.columns:
@@ -149,15 +149,15 @@ with tab1:
                 with pd.ExcelWriter(buf, engine="openpyxl") as w:
                     df_out.to_excel(w, index=False)
                 buf.seek(0)
-                            
+    
                 ts = datetime.now().strftime("%Y%m%d_%H%M%S")
                 st.download_button(
                     "⬇️ Download Excel",
                     data=buf,
-                    #file_name=f"workorders_{ts}.xlsx",
-                    file_name=f"Staging Dimensioned Records_Prod.xlsx",
+                    file_name="Staging Dimensioned Records_Prod.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+
 
     st.markdown("---")
 
