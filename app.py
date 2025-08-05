@@ -68,7 +68,7 @@ with tab1:
                 st.session_state.pop(key, None)
             st.rerun()
 
-   with col_right:
+    with col_right:
        if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
     
