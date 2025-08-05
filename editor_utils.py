@@ -22,7 +22,7 @@ def fill_temporal_columns(df, incs):
     ]
     for c in full:
         if c in df.columns:
-            df[c] = incs
+            df[c] = [d.strftime("%d/%m/%Y %H:%M") for d in incs]
     for c in time_only:
         if c in df.columns:
             df[c] = [d.time().strftime("%H:%M") for d in incs]
