@@ -68,9 +68,9 @@ with tab1:
                 st.session_state.pop(key, None)
             st.rerun()
 
-    with col_right:
-        if st.button("💾 Save changes"):
-            st.session_state.edited_df = st.session_state.latest_edited.copy()
+   with col_right:
+    if st.button("💾 Save changes"):
+        st.session_state.edited_df = st.session_state.latest_edited.copy()
 
     # Validación de valores inválidos para resaltar en la tabla
     df_for_editor = st.session_state.edited_df.copy()
@@ -97,19 +97,12 @@ with tab1:
     # Mostrar aviso si hay errores
     if invalid_mask.any().any():
         st.warning("⚠️ Se han detectado celdas con valores inválidos (marcadas en rojo). Revísalas antes de exportar.")
-
-
-
-
-
-        # 🔎 Resaltar fila seleccionada desde el mapa
+    
+    # 🔎 Resaltar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
         selected_id = st.session_state["selected_row_id"]
         st.markdown(f"<span style='color:green;'>🟢 Selected point: row {selected_id + 1}</span>", unsafe_allow_html=True)
-    
-        # Opcional: hacer scroll o marcar visualmente (Streamlit no permite highlight directo, pero puedes informar al usuario)
 
-    st.session_state.latest_edited = edited.copy()
 
     col_spacer, col1, col_spacer, col2, col_spacer, col3, col_spacer = st.columns([2, 3, 2, 3, 2, 3, 2])
 
