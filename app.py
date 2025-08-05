@@ -72,12 +72,36 @@ with tab1:
         if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
 
-    edited = st.data_editor(
-        st.session_state.edited_df,
-        num_rows="dynamic",
-        use_container_width=True,
-        key="editor"
-    )
+    # Validar valores inválidos para resaltar en la tabla
+    df_for_editor = st.session_state.edited_df.copy()
+    invalid_mask = pd.DataFrame(False, index=df_for_editor.index, columns=df_for_editor.columns)
+    
+    for col in config.required_columns:
+        if col in config.dropdown_values and col in df_for_editor.columns:
+            allowed = config.dropdown_values[col]
+            invalid = ~df_for_editor[col].isin(allowed)
+            invalid_mask[col] = invalid
+    
+    # Estilo personalizado para celdas inválidas
+    def highlight_invalid(val, col):
+        if invalid_mask.at[val.name, col]:
+            return "background-color: #ffcccc"  # rojo claro
+        return ""
+    
+    styled = df_for_editor.style
+    for col in df_for_editor.columns:
+        styled = styled.apply(lambda col_vals: [highlight_invalid(val, col_vals.name) for val in col_vals], axis=0)
+    
+    # Mostrar tabla con resaltado
+    st.dataframe(styled, use_container_width=True)
+    
+    # Guardar última edición para seguir usando
+    st.session_state.latest_edited = df_for_editor.copy()
+    
+    # Aviso si hay errores
+    if invalid_mask.any().any():
+        st.warning("⚠️ Se han detectado celdas con valores inválidos (marcadas en rojo). Revísalas antes de exportar.")
+
 
 
         # 🔎 Resaltar fila seleccionada desde el mapa
