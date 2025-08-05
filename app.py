@@ -82,25 +82,23 @@ with tab1:
             invalid = ~df_for_editor[col].isin(allowed)
             invalid_mask[col] = invalid
     
-    # Estilo personalizado para celdas inválidas
-    def highlight_invalid(val, col):
-        if invalid_mask.at[val.name, col]:
-            return "background-color: #ffcccc"  # rojo claro
-        return ""
+    # Función para aplicar color rojo claro donde invalid_mask es True
+    def highlight_invalid_cells(val, is_invalid):
+        return "background-color: #ffcccc" if is_invalid else ""
     
-    styled = df_for_editor.style
-    for col in df_for_editor.columns:
-        styled = styled.apply(lambda col_vals: [highlight_invalid(val, col_vals.name) for val in col_vals], axis=0)
+    styled_df = df_for_editor.style.applymap(
+        lambda val: highlight_invalid_cells(val, invalid_mask.at[val.name, invalid_mask.columns[val.index]])
+    )
     
-    # Mostrar tabla con resaltado
-    st.dataframe(styled, use_container_width=True)
+    st.dataframe(styled_df, use_container_width=True)
     
-    # Guardar última edición para seguir usando
+    # Guardar la edición
     st.session_state.latest_edited = df_for_editor.copy()
     
     # Aviso si hay errores
     if invalid_mask.any().any():
         st.warning("⚠️ Se han detectado celdas con valores inválidos (marcadas en rojo). Revísalas antes de exportar.")
+
 
 
 
