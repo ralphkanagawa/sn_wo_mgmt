@@ -37,7 +37,7 @@ with tab1:
     if not st.session_state.processed:
         col_geo, col_cov = st.columns(2)
         with col_geo:
-            geo_file = st.file_uploader("📍 Georadar CSV", type="csv")
+            geo_file = st.file_uploader("📍 Georadar (KMZ / KML / CSV)", type=["kmz", "kml", "csv"])
         with col_cov:
             cov_file = st.file_uploader("📶 Coverage CSV", type="csv")
 
