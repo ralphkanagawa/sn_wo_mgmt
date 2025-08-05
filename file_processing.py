@@ -17,49 +17,40 @@ def extract_kml_from_kmz(kmz_file):
                     return kml_file.read()
     return None
 
+import xml.etree.ElementTree as ET
+
 def parse_kml_data(kml_bytes):
-    """Extrae coordenadas desde datos binarios KML usando fastkml."""
-    from fastkml import kml
-
-    k = kml.KML()
+    """Parsea KML directamente con XML para extraer coordenadas."""
     try:
-        k.from_string(kml_bytes)
+        tree = ET.ElementTree(ET.fromstring(kml_bytes))
     except Exception:
-        st.error("❌ Error al parsear el archivo KML: formato inválido.")
+        st.error("❌ El archivo KML no es válido.")
         st.stop()
 
-    placemarks = []
+    root = tree.getroot()
 
-    def extract_placemarks(features):
-        for f in features:
-            try:
-                sub_features = list(f.features()) if hasattr(f, 'features') else []
-                if sub_features:
-                    yield from extract_placemarks(sub_features)
-                elif hasattr(f, 'geometry') and isinstance(f.geometry, Point):
-                    placemarks.append({
-                        "Latitude - Functional Location": f.geometry.y,
-                        "Longitude - Functional Location": f.geometry.x
-                    })
-            except Exception:
-                continue
+    # Buscar todos los elementos <coordinates>
+    ns = {'kml': 'http://www.opengis.net/kml/2.2'}
+    coords = root.findall('.//kml:coordinates', ns)
 
-    # ← Aquí evitamos el fallo directamente:
-    try:
-        features = list(k.features())
-        if not features:
-            st.error("❌ El archivo KML no contiene ningún punto o carpeta reconocible.")
-            st.stop()
-        list(extract_placemarks(features))
-    except Exception:
-        st.error("❌ Error al procesar las características del archivo KML.")
+    puntos = []
+    for coord in coords:
+        raw_text = coord.text.strip()
+        for line in raw_text.split():
+            parts = line.split(",")
+            if len(parts) >= 2:
+                lon, lat = float(parts[0]), float(parts[1])
+                puntos.append({
+                    "Latitude - Functional Location": lat,
+                    "Longitude - Functional Location": lon
+                })
+
+    if not puntos:
+        st.error("❌ No se encontraron coordenadas en el archivo.")
         st.stop()
 
-    if not placemarks:
-        st.error("❌ No se encontraron puntos con coordenadas en el archivo.")
-        st.stop()
+    return pd.DataFrame(puntos)
 
-    return pd.DataFrame(placemarks)
 
 def load_georadar_file(geo_file):
     """Carga datos del georadar desde KMZ, KML o CSV"""
