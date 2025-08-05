@@ -87,6 +87,11 @@ with tab1:
         if col in config.dropdown_values and col in edited.columns:
             allowed = config.dropdown_values[col]
             invalid_mask[col] = ~edited[col].isin(allowed)
+
+        # Validar valores de Child Functional Location contra todos los hijos conocidos
+    if "Name - Child Functional Location" in edited.columns:
+        all_children = [child for children in config.parent_child_map.values() for child in children]
+        invalid_mask["Name - Child Functional Location"] = ~edited["Name - Child Functional Location"].isin(all_children)
     
     # Mostrar advertencia si hay celdas inválidas
     if invalid_mask.any().any():
