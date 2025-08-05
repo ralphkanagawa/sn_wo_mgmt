@@ -22,22 +22,42 @@ def parse_kml_data(kml_bytes):
     from fastkml import kml
 
     k = kml.KML()
-    k.from_string(kml_bytes)
+    try:
+        k.from_string(kml_bytes)
+    except Exception:
+        st.error("❌ Error al parsear el archivo KML: formato inválido.")
+        st.stop()
+
     placemarks = []
 
     def extract_placemarks(features):
         for f in features:
-            if hasattr(f, 'features'):
-                yield from extract_placemarks(f.features())
-            elif hasattr(f, 'geometry') and isinstance(f.geometry, Point):
-                placemarks.append({
-                    "Latitude - Functional Location": f.geometry.y,
-                    "Longitude - Functional Location": f.geometry.x
-                })
+            try:
+                sub_features = list(f.features()) if hasattr(f, 'features') else []
+                if sub_features:
+                    yield from extract_placemarks(sub_features)
+                elif hasattr(f, 'geometry') and isinstance(f.geometry, Point):
+                    placemarks.append({
+                        "Latitude - Functional Location": f.geometry.y,
+                        "Longitude - Functional Location": f.geometry.x
+                    })
+            except Exception:
+                continue
 
-    # Ejecutar extracción correctamente
-    features = list(k.features())
-    list(extract_placemarks(features))
+    # ← Aquí evitamos el fallo directamente:
+    try:
+        features = list(k.features())
+        if not features:
+            st.error("❌ El archivo KML no contiene ningún punto o carpeta reconocible.")
+            st.stop()
+        list(extract_placemarks(features))
+    except Exception:
+        st.error("❌ Error al procesar las características del archivo KML.")
+        st.stop()
+
+    if not placemarks:
+        st.error("❌ No se encontraron puntos con coordenadas en el archivo.")
+        st.stop()
 
     return pd.DataFrame(placemarks)
 
