@@ -95,7 +95,7 @@ with tab1:
     
     # Mostrar advertencia si hay celdas inválidas
     if invalid_mask.any().any():
-        st.warning("⚠️ Se han detectado celdas con valores inválidos. Revisa el contenido antes de exportar.")
+        st.warning("⚠️ Invalid cell values have been detected. Please review the content before exporting.")
     
     # Actualizar DataFrame en memoria
     st.session_state.latest_edited = edited.copy()
@@ -157,7 +157,7 @@ with tab1:
                         missing_values.append(col)
     
             if missing_values:
-                st.error(f"No se puede generar el Excel. Las siguientes columnas requeridas tienen valores vacíos: {', '.join(missing_values)}")
+                st.error(f"The Excel file cannot be generated. The following required columns have empty values: {', '.join(missing_values)}")
             else:
                 df_out = df_check.copy()
                 for c in template_cols:
