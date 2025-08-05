@@ -69,39 +69,37 @@ with tab1:
             st.rerun()
 
     with col_right:
-       if st.button("💾 Save changes"):
+        if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
     
-    # Validación de valores inválidos para resaltar en la tabla
-    df_for_editor = st.session_state.edited_df.copy()
-    invalid_mask = pd.DataFrame(False, index=df_for_editor.index, columns=df_for_editor.columns)
-        
-    for col in config.required_columns:
-        if col in config.dropdown_values and col in df_for_editor.columns:
-            allowed = config.dropdown_values[col]
-            invalid = ~df_for_editor[col].isin(allowed)
-            invalid_mask[col] = invalid
-        
-    # Aplicar estilo: celdas inválidas resaltadas en rojo claro
-    styled_df = df_for_editor.style.apply(
-        lambda _: invalid_mask.replace({True: "background-color: #ffcccc", False: ""}),
-        axis=None
+    # Validar valores inválidos tras la edición
+    edited = st.data_editor(
+        st.session_state.edited_df,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor"
     )
-        
-    # Mostrar tabla con estilos aplicados
-    st.dataframe(styled_df, use_container_width=True)
-        
-    # Guardar edición para otros usos
-    st.session_state.latest_edited = df_for_editor.copy()
-        
-    # Mostrar aviso si hay errores
+    
+    # Crear máscara de celdas inválidas
+    invalid_mask = pd.DataFrame(False, index=edited.index, columns=edited.columns)
+    
+    for col in config.required_columns:
+        if col in config.dropdown_values and col in edited.columns:
+            allowed = config.dropdown_values[col]
+            invalid_mask[col] = ~edited[col].isin(allowed)
+    
+    # Mostrar advertencia si hay celdas inválidas
     if invalid_mask.any().any():
-        st.warning("⚠️ Se han detectado celdas con valores inválidos (marcadas en rojo). Revísalas antes de exportar.")
-        
-    # 🔎 Resaltar fila seleccionada desde el mapa
+        st.warning("⚠️ Se han detectado celdas con valores inválidos. Revisa el contenido antes de exportar.")
+    
+    # Actualizar DataFrame en memoria
+    st.session_state.latest_edited = edited.copy()
+    
+    # Mostrar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
         selected_id = st.session_state["selected_row_id"]
         st.markdown(f"<span style='color:green;'>🟢 Selected point: row {selected_id + 1}</span>", unsafe_allow_html=True)
+
 
     col_spacer, col1, col_spacer, col2, col_spacer, col3, col_spacer = st.columns([2, 3, 2, 3, 2, 3, 2])
 
