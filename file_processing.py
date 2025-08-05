@@ -29,13 +29,15 @@ def parse_kml_data(kml_bytes):
         for f in features:
             if hasattr(f, 'features'):
                 yield from extract_placemarks(f.features())
-            elif isinstance(f.geometry, Point):
+            elif hasattr(f, 'geometry') and isinstance(f.geometry, Point):
                 placemarks.append({
                     "Latitude - Functional Location": f.geometry.y,
                     "Longitude - Functional Location": f.geometry.x
                 })
 
-    extract_placemarks(k.features())
+    # Ejecutar extracción correctamente
+    list(extract_placemarks(k.features()))
+
     return pd.DataFrame(placemarks)
 
 def load_georadar_file(geo_file):
