@@ -25,5 +25,5 @@ def fill_temporal_columns(df, incs):
             df[c] = incs
     for c in time_only:
         if c in df.columns:
-            df[c] = [d.time().strftime("%H:%M:%S") for d in incs]
+            df[c] = [d.time().strftime("%H:%M") for d in incs]
     return df
