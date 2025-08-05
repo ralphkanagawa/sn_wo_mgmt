@@ -74,15 +74,7 @@
 
     <p><strong>Parent Locations:</strong> {{ parent_locations | join(', ') }}</p>
     <p><strong>Child Locations:</strong> {{ child_locations | join(', ') }}</p>
-
-    <p><strong>Streets with orders:</strong> {{ calles | join(', ') }}</p>
-    <p><strong>Orders per street:</strong></p>
-    <ul>
-        {% for calle, count in ordenes_por_calle.items() %}
-            <li>{{ calle }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
-
+    
         <p><strong>Incident types:</strong></p>
     <ul>
         {% for tipo, count in incident_type_counts.items() %}
@@ -117,8 +109,20 @@
             <li>{{ loc }}: {{ count }}</li>
         {% endfor %}
     </ul>
+
+    <p><strong>Streets with orders:</strong> {{ calles | join(', ') }}</p>
+    <p><strong>Orders per street:</strong></p>
+    <ul>
+        {% for calle, count in ordenes_por_calle.items() %}
+            <li>{{ calle }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
     
     <footer>
+        <div style="margin-top: 80px; border-top: 1px solid #000; padding-top: 40px;">
+    <p><strong>Firma:</strong></p>
+    <div style="width: 100%; height: 100px; border: 1px solid #ccc;"></div>
+</div>
     </footer>
 </body>
 </html>
