@@ -12,8 +12,8 @@ def render_map():
     df["row_id"] = df.index  # Para poder identificar la fila
 
     # Intentar usar columna de ID punto si existe
-    if "ID punto" in df.columns:
-        df["row_id"] = df["ID punto"] - 1  # Para alinear con el índice real
+    if "ID point" in df.columns:
+        df["row_id"] = df["ID point"] - 1  # Para alinear con el índice real
 
 
     lat_center = df["Latitude - Functional Location"].mean()
@@ -41,7 +41,7 @@ def render_map():
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(html=""),  # invisible
-            tooltip=f"ID punto: {row.get('ID punto', row_id)}"
+            tooltip=f"ID point: {row.get('ID point', row_id)}"
         ).add_to(m)
 
         # Añadir marcador visual para color
@@ -52,7 +52,7 @@ def render_map():
             fill=True,
             fill_color=color_from_dbm(dbm),
             fill_opacity=0.9,
-            popup=f"ID punto: {row.get('ID punto', row_id)} | dBm: {dbm}",
+            popup=f"ID point: {row.get('ID point', row_id)} | dBm: {dbm}",
         ).add_to(m)
 
 
