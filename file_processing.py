@@ -120,32 +120,54 @@ def asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15):
 
 # ─── Función principal ───────────────────────────────────────────────────────────
 
-def load_and_process_files(geo_file, cov_file, config):
-    geo_df = load_georadar_file(geo_file)
-    cov_df = pd.read_csv(cov_file)
+# file_processing.py
 
-    if not {"Latitud", "Longitud", "RSSI / RSCP (dBm)"}.issubset(cov_df.columns):
-        st.error("Coverage CSV debe tener columnas: Latitud, Longitud y RSSI / RSCP (dBm)")
-        st.stop()
+def load_and_process_files(geo_files, cov_file=None, config=None):
+    """
+    geo_files: lista de UploadedFile o un único UploadedFile
+    cov_file: UploadedFile opcional (CSV de cobertura)
+    """
+    import pandas as pd
+    import streamlit as st
 
-    # Completar columnas necesarias
+    # Aceptar uno o varios ficheros de georadar
+    files = geo_files if isinstance(geo_files, list) else [geo_files]
+
+    # Cargar y unir todos los puntos de georadar
+    frames = []
+    for f in files:
+        frames.append(load_georadar_file(f))
+    geo_df = pd.concat(frames, ignore_index=True)
+
+    # Completar columnas necesarias (aunque no haya cobertura)
     geo_df["Service Account - Work Order"] = "ANER_Senegal"
     geo_df["Billing Account - Work Order"] = "ANER_Senegal"
     geo_df["Work Order Type - Work Order"] = "Installation"
 
-    # Asignar cobertura por promedio en radio
-    geo_df = asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15)
+    # Si hay cobertura, asignar dBm y Gateway; si no, dejarlas vacías
+    if cov_file is not None:
+        cov_df = pd.read_csv(cov_file)
 
-    # Clasificar señal
-    geo_df["Gateway"] = geo_df["dBm"].apply(classify_signal)
+        required_cov = {"Latitud", "Longitud", "RSSI / RSCP (dBm)"}
+        if not required_cov.issubset(cov_df.columns):
+            st.error("Coverage CSV debe tener columnas: Latitud, Longitud y RSSI / RSCP (dBm)")
+            st.stop()
+
+        # Promedio en radio y clasificación
+        geo_df = asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15)
+        geo_df["Gateway"] = geo_df["dBm"].apply(classify_signal)
+
+        st.session_state.cov_df = cov_df.copy()
+        puntos_con_cobertura = geo_df["dBm"].notna().sum()
+        st.info(f"Cobertura vinculada con → {puntos_con_cobertura} de {len(geo_df)} puntos (media en radio de 15 metros)")
+    else:
+        if "dBm" not in geo_df.columns:
+            geo_df["dBm"] = pd.NA
+        if "Gateway" not in geo_df.columns:
+            geo_df["Gateway"] = pd.NA
+        st.info("Se cargó únicamente Georadar; no se vinculó Cobertura.")
 
     # Guardar en estado
     st.session_state.df = geo_df.copy()
     st.session_state.geo_df = geo_df.copy()
-    st.session_state.cov_df = cov_df.copy()
     st.session_state.processed = True
-
-    puntos_con_cobertura = geo_df["dBm"].notna().sum()
-    total_puntos = len(geo_df)
-    st.info(f"Cobertura vinculada con → {puntos_con_cobertura} de {total_puntos} puntos (media en radio de 15 metros)")
-
