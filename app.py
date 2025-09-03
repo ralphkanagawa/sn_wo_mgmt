@@ -228,10 +228,10 @@ with tab2:
 
     def save_geoposition_map(df, path="map_contextual.png"):
         fig, ax = plt.subplots(figsize=(10, 5))
-
+    
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
-
+    
         if not df_without.empty:
             ax.scatter(
                 df_without["Longitude - Functional Location"],
@@ -241,7 +241,7 @@ with tab2:
                 alpha=0.9,
                 edgecolors="black"
             )
-
+    
         if not df_with.empty:
             def color_for_dbm(dbm):
                 if dbm >= -69:
@@ -262,13 +262,21 @@ with tab2:
                 alpha=0.9,
                 edgecolors="black"
             )
-
+    
+        # --- NUEVO: Zoom centrado con área fija ---
+        lat_center = df["Latitude - Functional Location"].mean()
+        lon_center = df["Longitude - Functional Location"].mean()
+        delta = 0.02  # cuanto más pequeño, más zoom (0.01 ~ nivel calle, 0.05 ~ nivel barrio)
+        ax.set_xlim(lon_center - delta, lon_center + delta)
+        ax.set_ylim(lat_center - delta, lat_center + delta)
+    
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
         
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
+
 
     def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
         geolocator = Nominatim(user_agent="cm_salvi_app")
