@@ -19,7 +19,7 @@ def render_map():
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
-    m = folium.Map(location=[lat_center, lon_center], zoom_start=16)
+    m = folium.Map(location=[lat_center, lon_center], zoom_start=20)
 
     def color_from_dbm(dBm):
         if pd.isna(dBm):
