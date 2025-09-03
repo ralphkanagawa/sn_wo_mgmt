@@ -52,22 +52,47 @@ def parse_kml_data(kml_bytes):
     return pd.DataFrame(puntos)
 
 
+# file_processing.py
+import os, io  # añade estas importaciones si no están
+
 def load_georadar_file(geo_file):
-    """Carga datos del georadar desde KMZ, KML o CSV"""
-    name = geo_file.name.lower()
-    
+    """Carga Georadar desde KMZ/KML/CSV aceptando UploadedFile, ruta str/Path o file-like."""
+    # Normalizar: obtener nombre y manejador reutilizable
+    if isinstance(geo_file, (str, os.PathLike)):
+        name = os.fspath(geo_file).lower()
+        handle = geo_file  # es una ruta
+    else:
+        name = getattr(geo_file, "name", "") or ""
+        name = name.lower()
+        handle = geo_file
+        # asegurar puntero al inicio si es file-like
+        try:
+            handle.seek(0)
+        except Exception:
+            pass
+
     if name.endswith(".kmz"):
-        kml_data = extract_kml_from_kmz(geo_file)
-        if kml_data:
-            return parse_kml_data(kml_data)
+        # ZipFile necesita un objeto "seekable": si es file-like, lo envolvemos en BytesIO
+        if isinstance(handle, (str, os.PathLike)):
+            kml_data = extract_kml_from_kmz(handle)
         else:
-            st.error("❌ No se encontró archivo KML dentro del KMZ.")
+            data = handle.read()
+            kml_data = extract_kml_from_kmz(io.BytesIO(data))
+        if not kml_data:
+            st.error("❌ No se encontró un .kml dentro del KMZ.")
             st.stop()
-    elif name.endswith(".kml"):
-        kml_data = geo_file.read()
         return parse_kml_data(kml_data)
+
+    elif name.endswith(".kml"):
+        if isinstance(handle, (str, os.PathLike)):
+            with open(handle, "rb") as f:
+                kml_data = f.read()
+        else:
+            kml_data = handle.read()
+        return parse_kml_data(kml_data)
+
     elif name.endswith(".csv"):
-        df = pd.read_csv(geo_file)
+        df = pd.read_csv(handle)
         if not {"Latitud", "Longitud"}.issubset(df.columns):
             st.error("Georadar CSV debe tener columnas 'Latitud' y 'Longitud'")
             st.stop()
@@ -75,9 +100,11 @@ def load_georadar_file(geo_file):
             "Latitud": "Latitude - Functional Location",
             "Longitud": "Longitude - Functional Location"
         })
+
     else:
-        st.error("Tipo de archivo no compatible para Georadar.")
+        st.error("Tipo de archivo no compatible (usa KMZ/KML/CSV).")
         st.stop()
+
 
 # ─── Cobertura ───────────────────────────────────────────────────────────────────
 
