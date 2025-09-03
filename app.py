@@ -34,15 +34,26 @@ tab1, tab2 = st.tabs(["Work Order Management", "Report generator"])
 
 # TAB 1 - Todo el flujo actual
 with tab1:
+
     if not st.session_state.processed:
         col_geo, col_cov = st.columns(2)
         with col_geo:
-            geo_file = st.file_uploader("📍 Georadar (KMZ / KML / CSV)", type=["kmz", "kml", "csv"])
+            geo_files = st.file_uploader(
+                "📍 Georadar (KMZ / KML / CSV) — puedes subir varios",
+                type=["kmz", "kml", "csv"],
+                accept_multiple_files=True
+            )
         with col_cov:
-            cov_file = st.file_uploader("📶 Coverage CSV", type="csv")
-
-        if geo_file and cov_file:
-            load_and_process_files(geo_file, cov_file, config)
+            cov_file = st.file_uploader("📶 Coverage CSV (opcional)", type="csv")
+    
+        # Botón explícito para procesar (evita la carga automática)
+        procesar = st.button("⚙️ Procesar datos")
+    
+        # Reglas:
+        # - Requiere al menos un georadar
+        # - El CSV de cobertura es opcional
+        if procesar and geo_files:
+            load_and_process_files(geo_files, cov_file, config)
             st.rerun()
         else:
             st.stop()
