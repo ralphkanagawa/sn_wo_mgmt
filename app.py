@@ -263,15 +263,19 @@ with tab2:
                 edgecolors="black"
             )
     
-        # --- NUEVO: Zoom centrado con área fija ---
-        lat_center = df["Latitude - Functional Location"].mean()
-        lon_center = df["Longitude - Functional Location"].mean()
-        delta = 0.1  # cuanto más pequeño, más zoom (0.01 ~ nivel calle, 0.05 ~ nivel barrio)
-        ax.set_xlim(lon_center - delta, lon_center + delta)
-        ax.set_ylim(lat_center - delta, lat_center + delta)
+        # --- Usar bounding box dinámico ---
+        min_lon, max_lon = df["Longitude - Functional Location"].min(), df["Longitude - Functional Location"].max()
+        min_lat, max_lat = df["Latitude - Functional Location"].min(), df["Latitude - Functional Location"].max()
+    
+        lon_margin = (max_lon - min_lon) * 0.1  # 10% margen extra
+        lat_margin = (max_lat - min_lat) * 0.1
+    
+        ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
+        ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
     
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-        
+    
+        ax.set_aspect("equal", adjustable="box")  # mantiene proporción
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
