@@ -276,7 +276,7 @@ with tab2:
         
         ax.axis("off")
         plt.tight_layout()
-        plt.savefig(path, bbox_inches="tight", pad_inches=0, dpi=300)
+        plt.savefig(path, bbox_inches="tight", pad_inches=0, dpi=100)
         plt.close()
 
 
