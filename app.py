@@ -268,7 +268,7 @@ with tab2:
         min_lat, max_lat = df["Latitude - Functional Location"].min(), df["Latitude - Functional Location"].max()
     
         lon_margin = (max_lon - min_lon) * 0.1  # 10% margen extra
-        lat_margin = (max_lat - min_lat) * 0.3
+        lat_margin = (max_lat - min_lat) * 0.5
     
         ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
         ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
