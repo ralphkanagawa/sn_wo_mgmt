@@ -273,6 +273,13 @@ with tab2:
         #ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
         #ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
 
+        valid_df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"])
+        if valid_df.empty:
+            return  # o st.warning("No hay coordenadas válidas")
+        
+        lat_min, lat_max = valid_df["Latitude - Functional Location"].min(), valid_df["Latitude - Functional Location"].max()
+        lon_min, lon_max = valid_df["Longitude - Functional Location"].min(), valid_df["Longitude - Functional Location"].max()
+        
         lat_center = (lat_max + lat_min) / 2
         lon_center = (lon_max + lon_min) / 2
         
@@ -284,7 +291,7 @@ with tab2:
         
         ax.set_xlim(lon_center - delta, lon_center + delta)
         ax.set_ylim(lat_center - delta, lat_center + delta)
-        
+
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
 
         #ax.set_aspect("equal", adjustable="box")  # mantiene proporción
