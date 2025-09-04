@@ -227,7 +227,7 @@ with tab2:
     import matplotlib.patches as mpatches
 
     def save_geoposition_map(df, path="map_contextual.png"):
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=(12, 8))
     
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
@@ -278,7 +278,7 @@ with tab2:
         ax.set_aspect("equal", adjustable="box")  # mantiene proporción
         ax.axis("off")
         plt.tight_layout()
-        plt.savefig(path, bbox_inches="tight", pad_inches=0)
+        plt.savefig(path, bbox_inches="tight", pad_inches=0, dpi=300)
         plt.close()
 
 
