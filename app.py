@@ -267,21 +267,31 @@ with tab2:
         min_lon, max_lon = df["Longitude - Functional Location"].min(), df["Longitude - Functional Location"].max()
         min_lat, max_lat = df["Latitude - Functional Location"].min(), df["Latitude - Functional Location"].max()
     
-        lon_margin = (max_lon - min_lon) * 0.5  # 10% margen extra
-        lat_margin = (max_lat - min_lat) * 0.5
+        #lon_margin = (max_lon - min_lon) * 0.5  # 10% margen extra
+        #lat_margin = (max_lat - min_lat) * 0.5
     
-        ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
-        ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
-    
+        #ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
+        #ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
+
+        lat_center = (lat_max + lat_min) / 2
+        lon_center = (lon_max + lon_min) / 2
+        
+        lat_delta = (lat_max - lat_min) / 2
+        lon_delta = (lon_max - lon_min) / 2
+        
+        margin = 0.05
+        delta = max(lat_delta, lon_delta) + margin
+        
+        ax.set_xlim(lon_center - delta, lon_center + delta)
+        ax.set_ylim(lat_center - delta, lat_center + delta)
+        
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
 
-    
-        ax.set_aspect("equal", adjustable="box")  # mantiene proporción
+        #ax.set_aspect("equal", adjustable="box")  # mantiene proporción
         ax.axis("off")
         plt.tight_layout()
-        plt.savefig(path, bbox_inches="tight", pad_inches=0, dpi=300)
+        plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
-
 
     def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
         geolocator = Nominatim(user_agent="cm_salvi_app")
