@@ -266,7 +266,7 @@ with tab2:
         # --- NUEVO: Zoom centrado con área fija ---
         lat_center = df["Latitude - Functional Location"].mean()
         lon_center = df["Longitude - Functional Location"].mean()
-        delta = 0.5  # cuanto más pequeño, más zoom (0.01 ~ nivel calle, 0.05 ~ nivel barrio)
+        delta = 0.2  # cuanto más pequeño, más zoom (0.01 ~ nivel calle, 0.05 ~ nivel barrio)
         ax.set_xlim(lon_center - delta, lon_center + delta)
         ax.set_ylim(lat_center - delta, lat_center + delta)
     
