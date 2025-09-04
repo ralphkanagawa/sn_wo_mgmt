@@ -11,10 +11,8 @@ from visualizations import render_map
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
-# Configuración de la página  #
 st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
 
-# Inicialización
 if "processed" not in st.session_state:
     st.session_state.processed = False
 if "edited_df" not in st.session_state:
@@ -22,17 +20,13 @@ if "edited_df" not in st.session_state:
 if "latest_edited" not in st.session_state:
     st.session_state.latest_edited = pd.DataFrame()
 
-# Cargar configuración
 config = load_config()
 template_cols = load_excel_template_columns(config.excel_template_path)
 
-# Encabezado con logo
 st.image("logotipo-salvi-2024.png", width=120)
 
-# Crear pestañas inferiores
 tab1, tab2 = st.tabs(["Work Order Management", "Report generator"])
 
-# TAB 1 - Todo el flujo actual
 with tab1:
 
     if not st.session_state.processed:
@@ -46,12 +40,8 @@ with tab1:
         with col_cov:
             cov_file = st.file_uploader("📶 Coverage CSV (opcional)", type="csv")
     
-        # Botón explícito para procesar (evita la carga automática)
         procesar = st.button("⚙️ Procesar datos")
     
-        # Reglas:
-        # - Requiere al menos un georadar
-        # - El CSV de cobertura es opcional
         if procesar and geo_files:
             load_and_process_files(geo_files, cov_file, config)
             st.rerun()
@@ -60,7 +50,6 @@ with tab1:
 
     disp = st.session_state.df.copy()
 
-    # Añadir columna 'ID punto' si no existe
     if "ID point" not in disp.columns:
         disp.insert(0, "ID point", range(1, len(disp) + 1))
     
@@ -83,7 +72,6 @@ with tab1:
         if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
     
-    # Validar valores inválidos tras la edición
     edited = st.data_editor(
         st.session_state.edited_df,
         num_rows="dynamic",
@@ -91,7 +79,6 @@ with tab1:
         key="editor"
     )
     
-    # Crear máscara de celdas inválidas
     invalid_mask = pd.DataFrame(False, index=edited.index, columns=edited.columns)
     
     for col in config.required_columns:
@@ -99,23 +86,18 @@ with tab1:
             allowed = config.dropdown_values[col]
             invalid_mask[col] = ~edited[col].isin(allowed)
 
-        # Validar valores de Child Functional Location contra todos los hijos conocidos
     if "Name - Child Functional Location" in edited.columns:
         all_children = [child for children in config.parent_child_map.values() for child in children]
         invalid_mask["Name - Child Functional Location"] = ~edited["Name - Child Functional Location"].isin(all_children)
     
-    # Mostrar advertencia si hay celdas inválidas
     if invalid_mask.any().any():
         st.warning("⚠️ Invalid cell values have been detected. Please review the content before exporting.")
     
-    # Actualizar DataFrame en memoria
     st.session_state.latest_edited = edited.copy()
     
-    # Mostrar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
         selected_id = st.session_state["selected_row_id"]
         st.markdown(f"<span style='color:green;'>🟢 Selected point: row {selected_id + 1}</span>", unsafe_allow_html=True)
-
 
     col_spacer, col1, col_spacer, col2, col_spacer, col3, col_spacer = st.columns([2, 3, 2, 3, 2, 3, 2])
 
@@ -160,7 +142,6 @@ with tab1:
         if st.button("Generate Excel"):
             df_check = st.session_state.edited_df.copy()
     
-            # Verificación estricta: columnas requeridas deben estar completas (no NaN, no "", no espacios)
             missing_values = []
             for col in config.required_columns:
                 if col in df_check.columns:
@@ -189,7 +170,6 @@ with tab1:
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
-                
     st.markdown("---")
 
     col_spacer, col_spacer, col_spacer, col_spacer, col1, col2, col3, col4, col_spacer, col_spacer, col_spacer, col_spacer = st.columns(12)
@@ -212,14 +192,7 @@ with tab1:
         unsafe_allow_html=True
     )
 
-    
-###########################################
-# --- TAB 2: Generación del Informe PDF ---
-###########################################
-
 with tab2:
-    #st.markdown("#### Generación de informe PDF con mapa de puntos")
-
     from jinja2 import Template
     from xhtml2pdf import pisa
     import contextily as ctx
@@ -227,7 +200,7 @@ with tab2:
     import matplotlib.patches as mpatches
 
     def save_geoposition_map(df, path="map_contextual.png"):
-        fig, ax = plt.subplots(figsize=(12, 8))
+        fig, ax = plt.subplots(figsize=(10, 5))
     
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
@@ -245,11 +218,11 @@ with tab2:
         if not df_with.empty:
             def color_for_dbm(dbm):
                 if dbm >= -69:
-                    return "#009933"  # verde
+                    return "#009933"
                 elif -80 <= dbm < -69:
-                    return "#FFA500"  # naranja
+                    return "#FFA500"
                 elif dbm < -80:
-                    return "#FF0000"  # rojo
+                    return "#FF0000"
                 return "lightgray"
             
             colors = df_with["dBm"].apply(color_for_dbm)
@@ -262,166 +235,30 @@ with tab2:
                 alpha=0.9,
                 edgecolors="black"
             )
-    
-        # --- Usar bounding box dinámico ---
-        min_lon, max_lon = df["Longitude - Functional Location"].min(), df["Longitude - Functional Location"].max()
-        min_lat, max_lat = df["Latitude - Functional Location"].min(), df["Latitude - Functional Location"].max()
-    
-        #lon_margin = (max_lon - min_lon) * 0.5  # 10% margen extra
-        #lat_margin = (max_lat - min_lat) * 0.5
-    
-        #ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
-        #ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
 
         valid_df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"])
         if valid_df.empty:
-            return  # o st.warning("No hay coordenadas válidas")
-        
+            return
+
         lat_min, lat_max = valid_df["Latitude - Functional Location"].min(), valid_df["Latitude - Functional Location"].max()
         lon_min, lon_max = valid_df["Longitude - Functional Location"].min(), valid_df["Longitude - Functional Location"].max()
-        
+
         lat_center = (lat_max + lat_min) / 2
         lon_center = (lon_max + lon_min) / 2
-        
+
         lat_delta = (lat_max - lat_min) / 2
         lon_delta = (lon_max - lon_min) / 2
-        
+
         margin = 0.05
         delta = max(lat_delta, lon_delta) + margin
-        
+
         ax.set_xlim(lon_center - delta, lon_center + delta)
         ax.set_ylim(lat_center - delta, lat_center + delta)
-
+        ax.set_aspect("equal", adjustable="box")
+    
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-
-        #ax.set_aspect("equal", adjustable="box")  # mantiene proporción
+        
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
-
-    def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
-        geolocator = Nominatim(user_agent="cm_salvi_app")
-        geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1, return_value_on_exception=None)
-    
-        calles = []
-        for _, row in df.iterrows():
-            lat, lon = row[lat_col], row[lon_col]
-            if pd.notna(lat) and pd.notna(lon):
-                location = geocode((lat, lon), language="es")
-                calle = location.raw["address"].get("road") if location else None
-                calles.append(calle)
-            else:
-                calles.append(None)
-        return calles
-
-
-    def render_pdf(template_path, context, output_path):
-        with open(template_path, "r", encoding="utf-8") as f:
-            html = Template(f.read()).render(**context)
-        with open(output_path, "wb") as f:
-            pisa.CreatePDF(html, dest=f)
-
-    def safe_unique(df, col):
-        return df[col].dropna().unique().tolist() if col in df.columns else []
-    
-    if st.session_state.edited_df.empty:
-        st.warning("No data available. Please, load and edit on the Work Order Management tab.")
-    else:
-        df_full = st.session_state.df.copy()
-        save_geoposition_map(df_full, "map_contextual.png")
-
-        col1, col2, col3 = st.columns([1, 2, 1])  # columna central más ancha
-        
-        with col2:
-            st.image("map_contextual.png", use_container_width=True)
-            col_spacer, col1, col2, col3, col4, col_spacer, = st.columns(6)
-    
-            with col1:
-                st.markdown("🟢 **Good**", unsafe_allow_html=True)
-            with col2:
-                st.markdown("🟠 **Enough**", unsafe_allow_html=True)
-            with col3:
-                st.markdown("🔴 **Insufficient**", unsafe_allow_html=True)
-            with col4:
-                st.markdown("⚪ **No data**", unsafe_allow_html=True)
-
-        b1, b2, b3 = st.columns([5, 2, 4])
-        with b2:
-            if st.button("📄 Generate Report PDF"):
-                df_full = st.session_state.df.copy()
-            
-                # Añadir columnas complementarias desde la edición manual
-                cols_complementarias = [
-                    "Name - Parent Functional Location",
-                    "Name - Child Functional Location",
-                    "Incident Type - Work Order",
-                    "Owner - Work Order",
-                    "Name - Bookable Resource Booking"
-                ]
-                edited_df = st.session_state.edited_df.copy()
-                for col in cols_complementarias:
-                    if col in edited_df.columns:
-                        df_full[col] = edited_df[col]
-            
-                # Guardar mapa con cobertura
-                save_geoposition_map(df_full, "map_contextual.png")
-            
-                # Obtener calles a partir de coordenadas
-                df_full["Street (by coords)"] = obtener_calles_por_geocodificacion(
-                    df_full,
-                    "Latitude - Functional Location",
-                    "Longitude - Functional Location"
-                )
-                calles_validas = df_full["Street (by coords)"].dropna()
-                calles_unicas = calles_validas.unique().tolist()
-                ordenes_por_calle = calles_validas.value_counts().to_dict()
-            
-                # Métricas del resumen
-                total_ordenes = len(df_full)
-                total_yes = (df_full["Gateway"] == "YES").sum()
-                total_no = (df_full["Gateway"] == "NO").sum()
-            
-                # Nuevos conteos por categoría
-                incident_type_counts = df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict()
-                owner_counts = df_full["Owner - Work Order"].value_counts(dropna=True).to_dict()
-                resource_counts = df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict()
-                parent_location_counts = df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict()
-                child_location_counts = df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict()
-            
-            
-                context = {
-                    "fecha": datetime.now().strftime("%d/%m/%Y"),
-                    "total_ordenes": total_ordenes,
-                    "total_yes": total_yes,
-                    "total_no": total_no,
-                    "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
-                    "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
-                    "calles": calles_unicas,
-                    "ordenes_por_calle": ordenes_por_calle,
-                    "incident_types": safe_unique(df_full, "Incident Type - Work Order"),
-                    "owners": safe_unique(df_full, "Owner - Work Order"),
-                    "resources": safe_unique(df_full, "Name - Bookable Resource Booking"),
-                    "incident_type_counts": df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict(),
-                    "owner_counts": df_full["Owner - Work Order"].value_counts(dropna=True).to_dict(),
-                    "resource_counts": df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict(),
-                    "parent_location_counts": df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict(),
-                    "child_location_counts": df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict(),
-                }
-                
-                render_pdf("report_template.html", context, "informe.pdf")
-                with open("informe.pdf", "rb") as f:
-                    st.download_button(
-                        "⬇️ Download Report PDF",
-                        data=f,
-                        file_name="informe.pdf",
-                        mime="application/pdf"
-                    )
-    
-        st.markdown(
-            "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
-            "Developed in Streamlit by CM SALVI • 2025"
-            "</div>",
-            unsafe_allow_html=True
-        )
-    
