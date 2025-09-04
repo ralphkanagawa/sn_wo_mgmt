@@ -274,7 +274,7 @@ with tab2:
         ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
     
         #ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-        ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.Stamen.TonerLite, zoom=12)
+        ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik, zoom=12)
     
         ax.set_aspect("equal", adjustable="box")  # mantiene proporción
         ax.axis("off")
