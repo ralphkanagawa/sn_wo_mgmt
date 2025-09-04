@@ -269,8 +269,6 @@ with tab2:
         delta = 0.5  # cuanto más pequeño, más zoom (0.01 ~ nivel calle, 0.05 ~ nivel barrio)
         ax.set_xlim(lon_center - delta, lon_center + delta)
         ax.set_ylim(lat_center - delta, lat_center + delta)
-
-        ax.set_aspect('equal', adjustable='box')
     
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
         
