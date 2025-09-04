@@ -272,11 +272,11 @@ with tab2:
 
         ax.set_aspect('equal', adjustable='box')
     
-        ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
+        ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik, zoom=14)
         
         ax.axis("off")
         plt.tight_layout()
-        plt.savefig(path, bbox_inches="tight", pad_inches=0)
+        plt.savefig(path, bbox_inches="tight", pad_inches=0, dpi=300)
         plt.close()
 
 
