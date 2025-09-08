@@ -11,7 +11,7 @@ from visualizations import render_map
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
-# Configuración de la página  #
+# Configuración de la página
 st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
 
 # Inicialización
@@ -26,15 +26,23 @@ if "latest_edited" not in st.session_state:
 config = load_config()
 template_cols = load_excel_template_columns(config.excel_template_path)
 
+# --- NUEVO: cargar columnas visibles desde config.ini ---
+import configparser
+cfg = configparser.ConfigParser()
+cfg.optionxform = str
+cfg.read("config.ini")
+visible_cols = []
+if cfg.has_section("VISIBLE_COLUMNS"):
+    visible_cols = [c.strip() for c in cfg.get("VISIBLE_COLUMNS", "columns").split(",") if c]
+
 # Encabezado con logo
 st.image("logotipo-salvi-2024.png", width=120)
 
 # Crear pestañas inferiores
 tab1, tab2 = st.tabs(["Work Order Management", "Report generator"])
 
-# TAB 1 - Todo el flujo actual
+# TAB 1
 with tab1:
-
     if not st.session_state.processed:
         col_geo, col_cov = st.columns(2)
         with col_geo:
@@ -45,13 +53,9 @@ with tab1:
             )
         with col_cov:
             cov_file = st.file_uploader("📶 Coverage CSV (opcional)", type="csv")
-    
-        # Botón explícito para procesar (evita la carga automática)
+
         procesar = st.button("⚙️ Procesar datos")
-    
-        # Reglas:
-        # - Requiere al menos un georadar
-        # - El CSV de cobertura es opcional
+
         if procesar and geo_files:
             load_and_process_files(geo_files, cov_file, config)
             st.rerun()
@@ -60,14 +64,21 @@ with tab1:
 
     disp = st.session_state.df.copy()
 
-    # Añadir columna 'ID punto' si no existe
+    # Añadir columna 'ID point'
     if "ID point" not in disp.columns:
         disp.insert(0, "ID point", range(1, len(disp) + 1))
-    
+
     for c in template_cols:
         if c not in disp.columns:
             disp[c] = ""
+
     disp = disp[["ID point"] + [col for col in template_cols if col != "ID point"]]
+
+    # --- NUEVO: limitar al conjunto visible si está definido ---
+    if visible_cols:
+        # Siempre conservar ID point aunque no esté en visibles
+        keep = ["ID point"] + [c for c in visible_cols if c in disp.columns]
+        disp = disp[keep]
 
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
@@ -82,34 +93,34 @@ with tab1:
     with col_right:
         if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
-    
-    # Validar valores inválidos tras la edición
+
+    # Editor
     edited = st.data_editor(
         st.session_state.edited_df,
         num_rows="dynamic",
         use_container_width=True,
         key="editor"
     )
-    
-    # Crear máscara de celdas inválidas
+
+    # Validación
     invalid_mask = pd.DataFrame(False, index=edited.index, columns=edited.columns)
-    
     for col in config.required_columns:
         if col in config.dropdown_values and col in edited.columns:
             allowed = config.dropdown_values[col]
             invalid_mask[col] = ~edited[col].isin(allowed)
-
-        # Validar valores de Child Functional Location contra todos los hijos conocidos
     if "Name - Child Functional Location" in edited.columns:
         all_children = [child for children in config.parent_child_map.values() for child in children]
         invalid_mask["Name - Child Functional Location"] = ~edited["Name - Child Functional Location"].isin(all_children)
-    
-    # Mostrar advertencia si hay celdas inválidas
+
     if invalid_mask.any().any():
         st.warning("⚠️ Invalid cell values have been detected. Please review the content before exporting.")
-    
-    # Actualizar DataFrame en memoria
+
     st.session_state.latest_edited = edited.copy()
+
+    # (resto de la lógica de TAB 1 sin cambios)
+    # ...
+    # TAB 2 sigue igual
+
     
     # Mostrar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
