@@ -75,10 +75,10 @@ with tab1:
     disp = disp[["ID point"] + [col for col in template_cols if col != "ID point"]]
 
     # --- NUEVO: limitar al conjunto visible si está definido ---
-    if visible_cols:
+    #if visible_cols:
         # Siempre conservar ID point aunque no esté en visibles
-        keep = ["ID point"] + [c for c in visible_cols if c in disp.columns]
-        disp = disp[keep]
+        #keep = ["ID point"] + [c for c in visible_cols if c in disp.columns]
+        #disp = disp[keep]
 
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
