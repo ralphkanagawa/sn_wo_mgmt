@@ -425,7 +425,7 @@ with tab2:
                     st.download_button(
                         "⬇️ Download Report PDF",
                         data=f,
-                        file_name="informe.pdf",
+                        file_name="report.pdf",
                         mime="application/pdf"
                     )
     
