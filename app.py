@@ -54,7 +54,7 @@ with tab1:
         with col_cov:
             cov_file = st.file_uploader("📶 Coverage CSV (opcional)", type="csv")
 
-        procesar = st.button("⚙️ Procesar datos")
+        procesar = st.button("⚙️ Process files")
 
         if procesar and geo_files:
             load_and_process_files(geo_files, cov_file, config)
