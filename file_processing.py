@@ -24,7 +24,7 @@ def parse_kml_data(kml_bytes):
     try:
         tree = ET.ElementTree(ET.fromstring(kml_bytes))
     except Exception:
-        st.error("❌ El archivo KML no es válido.")
+        st.error("❌ KML file not valid.")
         st.stop()
 
     root = tree.getroot()
@@ -44,7 +44,7 @@ def parse_kml_data(kml_bytes):
                 })
 
     if not puntos:
-        st.error("❌ No se encontraron coordenadas en el archivo.")
+        st.error("❌ Coordinates not found in the file.")
         st.stop()
 
     return pd.DataFrame(puntos)
@@ -69,7 +69,7 @@ def load_georadar_file(geo_file):
             data = handle.read()
             kml_data = extract_kml_from_kmz(io.BytesIO(data))
         if not kml_data:
-            st.error("❌ No se encontró un .kml dentro del KMZ.")
+            st.error("❌ .kml not found inside the KMZ file.")
             st.stop()
         return parse_kml_data(kml_data)
 
@@ -84,7 +84,7 @@ def load_georadar_file(geo_file):
     elif name.endswith(".csv"):
         df = pd.read_csv(handle)
         if not {"Latitud", "Longitud"}.issubset(df.columns):
-            st.error("Georadar CSV debe tener columnas 'Latitud' y 'Longitud'")
+            st.error("Georadar file must contain 'Latitude' and 'Longitude' columns.")
             st.stop()
         return df.rename(columns={
             "Latitud": "Latitude - Functional Location",
@@ -92,7 +92,7 @@ def load_georadar_file(geo_file):
         })
 
     else:
-        st.error("Tipo de archivo no compatible (usa KMZ/KML/CSV).")
+        st.error("File type not compatible (use KMZ/KML/CSV).")
         st.stop()
 
 # ─── Cobertura ───────────────────────────────────────────────────────────────────
@@ -153,7 +153,7 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
         base = os.path.basename(fname)
         parts = base.split("_")
         if len(parts) < 2:
-            st.error(f"Nombre de fichero no válido: {fname}")
+            st.error(f"File name not valid: {fname}")
             st.stop()
 
         child_loc = parts[0]
@@ -166,7 +166,7 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
         frames.append(df_tmp)
 
     if len(parents_detectados) > 1:
-        st.error(f"❌ Los ficheros subidos no corresponden al mismo Parent Location: {parents_detectados}")
+        st.error(f"❌ The files uploaded doesn't correspond to the same Parent Location: {parents_detectados}")
         st.stop()
 
     geo_df = pd.concat(frames, ignore_index=True)
@@ -181,7 +181,7 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
         cov_df = pd.read_csv(cov_file)
         required_cov = {"Latitud", "Longitud", "RSSI / RSCP (dBm)"}
         if not required_cov.issubset(cov_df.columns):
-            st.error("Coverage CSV debe tener columnas: Latitud, Longitud y RSSI / RSCP (dBm)")
+            st.error("Coverage file must contain 'Latitude', 'Longitude' and 'RSSI / RSCP (dBm)' columns.")
             st.stop()
 
         geo_df = asignar_cobertura_promedio_por_radio(geo_df, cov_df, radio_metros=15)
@@ -189,13 +189,13 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
 
         st.session_state.cov_df = cov_df.copy()
         puntos_con_cobertura = geo_df["dBm"].notna().sum()
-        st.info(f"Cobertura vinculada con → {puntos_con_cobertura} de {len(geo_df)} puntos")
+        st.info(f"Coverage linked with → {puntos_con_cobertura} of {len(geo_df)} points")
     else:
         if "dBm" not in geo_df.columns:
             geo_df["dBm"] = pd.NA
         if "Gateway" not in geo_df.columns:
             geo_df["Gateway"] = pd.NA
-        st.info("Se cargó únicamente Georadar; no se vinculó Cobertura.")
+        st.info("Only Georadar file uploaded, a Coverage file hasn't been uploaded.")
 
     # Guardar en estado
     st.session_state.df = geo_df.copy()
