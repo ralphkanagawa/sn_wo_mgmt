@@ -12,7 +12,7 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
 # Configuración de la página
-st.set_page_config(page_title="Potential Work Orders Management", layout="wide")
+st.set_page_config(page_title="Work Orders WebApp", layout="wide")
 
 # Inicialización
 if "processed" not in st.session_state:
