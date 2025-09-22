@@ -428,6 +428,17 @@ with tab2:
                         file_name="report.pdf",
                         mime="application/pdf"
                     )
+
+            if st.button("📄 Generate Report DOCX"):
+                render_docx(context, report_meta, "informe.docx")
+                with open("informe.docx", "rb") as f:
+                    st.download_button(
+                        "⬇️ Download Report DOCX",
+                        data=f,
+                        file_name="informe.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    )
+
     
         st.markdown(
             "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
