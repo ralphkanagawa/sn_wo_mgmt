@@ -226,107 +226,60 @@ with tab1:
 
     
 ###########################################
-# --- TAB 2: Generación del Informe PDF ---
+# --- TAB 2: Generación del Informe ---
 ###########################################
 
 with tab2:
-    #st.markdown("#### Generación de informe PDF con mapa de puntos")
-
     from jinja2 import Template
     from xhtml2pdf import pisa
     import contextily as ctx
     import matplotlib.pyplot as plt
-    import matplotlib.patches as mpatches
+    from htmldocx import HtmlToDocx
 
+    # --- Funciones auxiliares ---
     def save_geoposition_map(df, path="map_contextual.png"):
         fig, ax = plt.subplots(figsize=(12, 8))
-    
         df_with = df[df["dBm"].notna()]
         df_without = df[df["dBm"].isna()]
-    
+
         if not df_without.empty:
             ax.scatter(
                 df_without["Longitude - Functional Location"],
                 df_without["Latitude - Functional Location"],
-                color="lightgray",
-                s=50,
-                alpha=0.9,
-                edgecolors="black"
+                color="lightgray", s=50, alpha=0.9, edgecolors="black"
             )
-    
         if not df_with.empty:
             def color_for_dbm(dbm):
                 if dbm >= -69:
-                    return "#009933"  # verde
+                    return "#009933"
                 elif -80 <= dbm < -69:
-                    return "#FFA500"  # naranja
+                    return "#FFA500"
                 elif dbm < -80:
-                    return "#FF0000"  # rojo
+                    return "#FF0000"
                 return "lightgray"
-            
             colors = df_with["dBm"].apply(color_for_dbm)
-            
             ax.scatter(
                 df_with["Longitude - Functional Location"],
                 df_with["Latitude - Functional Location"],
-                color=colors,
-                s=60,
-                alpha=0.9,
-                edgecolors="black"
+                color=colors, s=60, alpha=0.9, edgecolors="black"
             )
-    
-        # --- Usar bounding box dinámico ---
-        min_lon, max_lon = df["Longitude - Functional Location"].min(), df["Longitude - Functional Location"].max()
-        min_lat, max_lat = df["Latitude - Functional Location"].min(), df["Latitude - Functional Location"].max()
-    
-        #lon_margin = (max_lon - min_lon) * 0.5  # 10% margen extra
-        #lat_margin = (max_lat - min_lat) * 0.5
-    
-        #ax.set_xlim(min_lon - lon_margin, max_lon + lon_margin)
-        #ax.set_ylim(min_lat - lat_margin, max_lat + lat_margin)
 
         valid_df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"])
         if valid_df.empty:
-            return  # o st.warning("No hay coordenadas válidas")
-        
+            return
         lat_min, lat_max = valid_df["Latitude - Functional Location"].min(), valid_df["Latitude - Functional Location"].max()
         lon_min, lon_max = valid_df["Longitude - Functional Location"].min(), valid_df["Longitude - Functional Location"].max()
-        
         lat_center = (lat_max + lat_min) / 2
         lon_center = (lon_max + lon_min) / 2
-        
-        lat_delta = (lat_max - lat_min) / 2
-        lon_delta = (lon_max - lon_min) / 2
-        
-        margin = 0.05
-        delta = max(lat_delta, lon_delta) + margin
-        
+        delta = max((lat_max - lat_min) / 2, (lon_max - lon_min) / 2) + 0.05
         ax.set_xlim(lon_center - delta, lon_center + delta)
         ax.set_ylim(lat_center - delta, lat_center + delta)
 
         ctx.add_basemap(ax, crs="EPSG:4326", source=ctx.providers.OpenStreetMap.Mapnik)
-
-        #ax.set_aspect("equal", adjustable="box")  # mantiene proporción
         ax.axis("off")
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
-
-    def obtener_calles_por_geocodificacion(df, lat_col, lon_col):
-        geolocator = Nominatim(user_agent="cm_salvi_app")
-        geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1, return_value_on_exception=None)
-    
-        calles = []
-        for _, row in df.iterrows():
-            lat, lon = row[lat_col], row[lon_col]
-            if pd.notna(lat) and pd.notna(lon):
-                location = geocode((lat, lon), language="es")
-                calle = location.raw["address"].get("road") if location else None
-                calles.append(calle)
-            else:
-                calles.append(None)
-        return calles
-
 
     def render_pdf(template_path, context, output_path):
         with open(template_path, "r", encoding="utf-8") as f:
@@ -334,155 +287,77 @@ with tab2:
         with open(output_path, "wb") as f:
             pisa.CreatePDF(html, dest=f)
 
-    def render_docx(context, meta, output_path="informe.docx"):
+    def render_docx(template_path, context, output_path="informe.docx"):
+        with open(template_path, "r", encoding="utf-8") as f:
+            html = Template(f.read()).render(**context)
         doc = Document()
-        doc.add_heading("Compte rendu visite", 0)
-            
-        # Datos básicos
-        doc.add_paragraph(f"Date : {meta.get('date','')}")
-        doc.add_paragraph(f"Région–Département : {meta.get('region','')}")
-        doc.add_paragraph(f"Point Focal : {meta.get('point_focal','')}")
-        doc.add_paragraph(f"Représentant ANER : {meta.get('rep_aner','')}")
-        doc.add_paragraph(f"Représentant SALVI Sénégal : {meta.get('rep_salvi','')}")
-        doc.add_paragraph(f"Restants/Surplus : {meta.get('restants','')}")
-        doc.add_paragraph(f"Observations : {meta.get('observations','')}")
-            
-        # Totales del contexto
-        doc.add_paragraph(f"Total ordres : {context.get('total_ordenes','')}")
-        doc.add_paragraph(f"Avec couverture : {context.get('total_yes','')}  Sans : {context.get('total_no','')}")
-            
+        parser = HtmlToDocx()
+        parser.add_html_to_document(html, doc)
         doc.save(output_path)
 
-    # Inputs para metadatos
-    report_meta = {
-        "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
-        "region_departement": st.text_input("Région–Département"),
-        "point_focal": st.text_input("Point Focal"),
-        "rep_aner": st.text_input("Représentant ANER"),
-        "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
-        "total_commune": st.text_input("Total lampadaires attribués à la commune"),
-        "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
-        "surplus": st.text_input("Restants/Surplus"),
-        "observations": st.text_area("Observations globales"),
-        "nom_salvi": st.text_input("Nom représentant SALVI"),
-        "date_salvi": st.text_input("Date SALVI"),
-        "nom_aner": st.text_input("Nom représentant ANER"),
-        "date_aner": st.text_input("Date ANER"),
-        "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
-        "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
-    }
-
-
-    
     def safe_unique(df, col):
         return df[col].dropna().unique().tolist() if col in df.columns else []
-    
+
+    # --- Generación de reportes ---
     if st.session_state.edited_df.empty:
         st.warning("No data available. Please, load and edit on the Work Order Management tab.")
     else:
         df_full = st.session_state.df.copy()
         save_geoposition_map(df_full, "map_contextual.png")
 
-        col1, col2, col3 = st.columns([1, 2, 1])  # columna central más ancha
-        
+        col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.image("map_contextual.png", use_container_width=True)
-            col_spacer, col1, col2, col3, col4, col_spacer, = st.columns(6)
-    
-            with col1:
-                st.markdown("🟢 **Good**", unsafe_allow_html=True)
-            with col2:
-                st.markdown("🟠 **Enough**", unsafe_allow_html=True)
-            with col3:
-                st.markdown("🔴 **Insufficient**", unsafe_allow_html=True)
-            with col4:
-                st.markdown("⚪ **No data**", unsafe_allow_html=True)
 
-        b1, b2, b3 = st.columns([5, 2, 4])
-        with b2:
+        # Recalcular contexto
+        calles_validas = df_full["Latitude - Functional Location"].notna()
+        total_ordenes = len(df_full)
+        total_yes = (df_full["Gateway"] == "YES").sum()
+        total_no = (df_full["Gateway"] == "NO").sum()
+
+        context = {
+            "fecha": datetime.now().strftime("%d/%m/%Y"),
+            "total_ordenes": total_ordenes,
+            "total_yes": total_yes,
+            "total_no": total_no,
+            "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
+            "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
+        }
+
+        # Inputs adicionales para DOCX
+        report_meta = {
+            "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
+            "region_departement": st.text_input("Région–Département"),
+            "point_focal": st.text_input("Point Focal"),
+            "rep_aner": st.text_input("Représentant ANER"),
+            "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
+            "total_commune": st.text_input("Total lampadaires attribués à la commune"),
+            "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
+            "surplus": st.text_input("Restants/Surplus"),
+            "observations": st.text_area("Observations globales"),
+            "nom_salvi": st.text_input("Nom représentant SALVI"),
+            "date_salvi": st.text_input("Date SALVI"),
+            "nom_aner": st.text_input("Nom représentant ANER"),
+            "date_aner": st.text_input("Date ANER"),
+            "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
+            "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
+        }
+
+        # Botones de exportación
+        colb1, colb2 = st.columns(2)
+        with colb1:
             if st.button("📄 Generate Report PDF"):
-                df_full = st.session_state.df.copy()
-            
-                # Añadir columnas complementarias desde la edición manual
-                cols_complementarias = [
-                    "Name - Parent Functional Location",
-                    "Name - Child Functional Location",
-                    "Incident Type - Work Order",
-                    "Owner - Work Order",
-                    "Name - Bookable Resource Booking"
-                ]
-                edited_df = st.session_state.edited_df.copy()
-                for col in cols_complementarias:
-                    if col in edited_df.columns:
-                        df_full[col] = edited_df[col]
-            
-                # Guardar mapa con cobertura
-                save_geoposition_map(df_full, "map_contextual.png")
-            
-                # Obtener calles a partir de coordenadas
-                df_full["Street (by coords)"] = obtener_calles_por_geocodificacion(
-                    df_full,
-                    "Latitude - Functional Location",
-                    "Longitude - Functional Location"
-                )
-                calles_validas = df_full["Street (by coords)"].dropna()
-                calles_unicas = calles_validas.unique().tolist()
-                ordenes_por_calle = calles_validas.value_counts().to_dict()
-            
-                # Métricas del resumen
-                total_ordenes = len(df_full)
-                total_yes = (df_full["Gateway"] == "YES").sum()
-                total_no = (df_full["Gateway"] == "NO").sum()
-            
-                # Nuevos conteos por categoría
-                incident_type_counts = df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict()
-                owner_counts = df_full["Owner - Work Order"].value_counts(dropna=True).to_dict()
-                resource_counts = df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict()
-                parent_location_counts = df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict()
-                child_location_counts = df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict()
-            
-            
-                context = {
-                    "fecha": datetime.now().strftime("%d/%m/%Y"),
-                    "total_ordenes": total_ordenes,
-                    "total_yes": total_yes,
-                    "total_no": total_no,
-                    "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
-                    "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
-                    "calles": calles_unicas,
-                    "ordenes_por_calle": ordenes_por_calle,
-                    "incident_types": safe_unique(df_full, "Incident Type - Work Order"),
-                    "owners": safe_unique(df_full, "Owner - Work Order"),
-                    "resources": safe_unique(df_full, "Name - Bookable Resource Booking"),
-                    "incident_type_counts": df_full["Incident Type - Work Order"].value_counts(dropna=True).to_dict(),
-                    "owner_counts": df_full["Owner - Work Order"].value_counts(dropna=True).to_dict(),
-                    "resource_counts": df_full["Name - Bookable Resource Booking"].value_counts(dropna=True).to_dict(),
-                    "parent_location_counts": df_full["Name - Parent Functional Location"].value_counts(dropna=True).to_dict(),
-                    "child_location_counts": df_full["Name - Child Functional Location"].value_counts(dropna=True).to_dict(),
-                }
-                
-                render_pdf("report_template.html", context, "informe.pdf")
+                render_pdf("report_template.html", {**context, **report_meta}, "informe.pdf")
                 with open("informe.pdf", "rb") as f:
-                    st.download_button(
-                        "⬇️ Download Report PDF",
-                        data=f,
-                        file_name="report.pdf",
-                        mime="application/pdf"
-                    )
-
+                    st.download_button("⬇️ Download Report PDF", f, file_name="report.pdf", mime="application/pdf")
+        with colb2:
             if st.button("📄 Generate Report DOCX"):
-                render_docx(context, report_meta, "informe.docx")
+                render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
                 with open("informe.docx", "rb") as f:
-                    st.download_button(
-                        "⬇️ Download Report DOCX",
-                        data=f,
-                        file_name="informe.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    )
+                    st.download_button("⬇️ Download Report DOCX", f, file_name="report.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
         st.markdown(
-            "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
-            "Developed in Streamlit by CM SALVI • 2025"
-            "</div>",
+            "<div style='text-align: center; color: gray; font-size: 0.875rem;'>Developed in Streamlit by CM SALVI • 2025</div>",
             unsafe_allow_html=True
         )
+
