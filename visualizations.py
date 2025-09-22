@@ -1,14 +1,4 @@
 import folium
-from streamlit_folium import st_folium
-import pandas as pd
-import streamlit as st
-
-import folium
-from streamlit_folium import st_folium
-import pandas as pd
-import streamlit as st
-
-import folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import st_folium
 import pandas as pd
@@ -43,6 +33,14 @@ def render_map():
     # Crear clúster
     cluster = MarkerCluster().add_to(m)
 
+    # Definir offsets para repartir etiquetas alrededor
+    offsets = [
+        "transform: translate(12px, 0);",     # derecha
+        "transform: translate(-22px, 0);",    # izquierda
+        "transform: translate(0, -18px);",    # arriba
+        "transform: translate(0, 12px);"      # abajo
+    ]
+
     for _, row in df.iterrows():
         lat = row["Latitude - Functional Location"]
         lon = row["Longitude - Functional Location"]
@@ -50,14 +48,17 @@ def render_map():
         row_id = row["row_id"]
         point_id = row.get("ID point", row_id)
 
-        # Marcador con número
+        style = offsets[row_id % len(offsets)]
+
+        # Marcador con número, desplazado según offset
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(
                 html=f"""
                 <div style="font-size: 13px; font-weight: bold; color: black;
                             text-shadow: -1px -1px 0 white, 1px -1px 0 white,
-                                         -1px 1px 0 white, 1px 1px 0 white;">
+                                         -1px 1px 0 white, 1px 1px 0 white;
+                            {style}">
                     {point_id}
                 </div>
                 """
@@ -89,5 +90,3 @@ def render_map():
         if not match.empty:
             selected_idx = match.iloc[0]["row_id"]
             st.session_state["selected_row_id"] = selected_idx
-
-
