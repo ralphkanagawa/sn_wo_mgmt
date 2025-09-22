@@ -10,6 +10,7 @@ from visualizations import render_map
 
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
+from docx import Document
 
 # Configuración de la página
 st.set_page_config(page_title="Work Orders WebApp", layout="wide")
@@ -429,6 +430,44 @@ with tab2:
                         mime="application/pdf"
                     )
 
+            def render_docx(context, meta, output_path="informe.docx"):
+                doc = Document()
+                doc.add_heading("Compte rendu visite", 0)
+            
+                # Datos básicos
+                doc.add_paragraph(f"Date : {meta.get('date','')}")
+                doc.add_paragraph(f"Région–Département : {meta.get('region','')}")
+                doc.add_paragraph(f"Point Focal : {meta.get('point_focal','')}")
+                doc.add_paragraph(f"Représentant ANER : {meta.get('rep_aner','')}")
+                doc.add_paragraph(f"Représentant SALVI Sénégal : {meta.get('rep_salvi','')}")
+                doc.add_paragraph(f"Restants/Surplus : {meta.get('restants','')}")
+                doc.add_paragraph(f"Observations : {meta.get('observations','')}")
+            
+                # Totales del contexto
+                doc.add_paragraph(f"Total ordres : {context.get('total_ordenes','')}")
+                doc.add_paragraph(f"Avec couverture : {context.get('total_yes','')}  Sans : {context.get('total_no','')}")
+            
+                doc.save(output_path)
+
+                # Inputs para metadatos
+                report_meta = {
+                    "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
+                    "region_departement": st.text_input("Région–Département"),
+                    "point_focal": st.text_input("Point Focal"),
+                    "rep_aner": st.text_input("Représentant ANER"),
+                    "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
+                    "total_commune": st.text_input("Total lampadaires attribués à la commune"),
+                    "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
+                    "surplus": st.text_input("Restants/Surplus"),
+                    "observations": st.text_area("Observations globales"),
+                    "nom_salvi": st.text_input("Nom représentant SALVI"),
+                    "date_salvi": st.text_input("Date SALVI"),
+                    "nom_aner": st.text_input("Nom représentant ANER"),
+                    "date_aner": st.text_input("Date ANER"),
+                    "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
+                    "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
+                }
+
             if st.button("📄 Generate Report DOCX"):
                 render_docx(context, report_meta, "informe.docx")
                 with open("informe.docx", "rb") as f:
@@ -439,7 +478,6 @@ with tab2:
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     )
 
-    
         st.markdown(
             "<div style='text-align: center; color: gray; font-size: 0.875rem;'>"
             "Developed in Streamlit by CM SALVI • 2025"
