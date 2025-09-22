@@ -11,10 +11,9 @@ def render_map():
     df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"]).reset_index(drop=True)
     df["row_id"] = df.index  # Para poder identificar la fila
 
-    # Intentar usar columna de ID punto si existe
+    # Intentar usar columna de ID point si existe
     if "ID point" in df.columns:
         df["row_id"] = df["ID point"] - 1  # Para alinear con el índice real
-
 
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
@@ -36,15 +35,21 @@ def render_map():
         lon = row["Longitude - Functional Location"]
         dbm = row.get("dBm", None)
         row_id = row["row_id"]
+        point_id = row.get("ID point", row_id)
 
-        # Añadir marcador invisible para mejorar detección del clic
+        # Etiqueta con número a la derecha del círculo
         folium.Marker(
             location=[lat, lon],
-            icon=folium.DivIcon(html=""),  # invisible
-            tooltip=f"ID point: {row.get('ID point', row_id)}"
+            icon=folium.DivIcon(
+                html=f"""
+                <div style="font-size: 12px; color: black; margin-left: 8px; white-space: nowrap;">
+                    {point_id}
+                </div>
+                """
+            )
         ).add_to(m)
 
-        # Añadir marcador visual para color
+        # Círculo de color
         folium.CircleMarker(
             location=[lat, lon],
             radius=6,
@@ -52,14 +57,12 @@ def render_map():
             fill=True,
             fill_color=color_from_dbm(dbm),
             fill_opacity=0.9,
-            popup=f"ID point: {row.get('ID point', row_id)} | dBm: {dbm}",
+            popup=f"ID point: {point_id} | dBm: {dbm}",
         ).add_to(m)
-
 
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
         map_data = st_folium(m, width=900, height=600)
-
 
     if map_data and map_data.get("last_clicked"):
         clicked = map_data["last_clicked"]
@@ -71,3 +74,4 @@ def render_map():
         if not match.empty:
             selected_idx = match.iloc[0]["row_id"]
             st.session_state["selected_row_id"] = selected_idx
+
