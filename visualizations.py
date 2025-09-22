@@ -3,17 +3,21 @@ from streamlit_folium import st_folium
 import pandas as pd
 import streamlit as st
 
+import folium
+from streamlit_folium import st_folium
+import pandas as pd
+import streamlit as st
+
 def render_map():
     if "latest_edited" not in st.session_state or st.session_state.latest_edited.empty:
         return
 
     df = st.session_state.latest_edited.copy()
     df = df.dropna(subset=["Latitude - Functional Location", "Longitude - Functional Location"]).reset_index(drop=True)
-    df["row_id"] = df.index  # Para poder identificar la fila
+    df["row_id"] = df.index
 
-    # Intentar usar columna de ID point si existe
     if "ID point" in df.columns:
-        df["row_id"] = df["ID point"] - 1  # Para alinear con el índice real
+        df["row_id"] = df["ID point"] - 1
 
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
@@ -30,6 +34,14 @@ def render_map():
         else:
             return "red"
 
+    # posiciones alternas para evitar solapamiento
+    offsets = [
+        "margin-left: 10px;",   # derecha
+        "margin-right: 10px;",  # izquierda
+        "margin-top: -15px;",   # arriba
+        "margin-top: 12px;",    # abajo
+    ]
+
     for _, row in df.iterrows():
         lat = row["Latitude - Functional Location"]
         lon = row["Longitude - Functional Location"]
@@ -37,12 +49,17 @@ def render_map():
         row_id = row["row_id"]
         point_id = row.get("ID point", row_id)
 
-        # Etiqueta con número a la derecha del círculo
+        style = offsets[row_id % len(offsets)]
+
+        # Etiqueta con desplazamiento
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(
                 html=f"""
-                <div style="font-size: 12px; color: black; margin-left: 8px; white-space: nowrap;">
+                <div style="font-size: 13px; font-weight: bold; color: black;
+                            text-shadow: -1px -1px 0 white, 1px -1px 0 white,
+                                         -1px 1px 0 white, 1px 1px 0 white;
+                            {style}">
                     {point_id}
                 </div>
                 """
@@ -74,4 +91,5 @@ def render_map():
         if not match.empty:
             selected_idx = match.iloc[0]["row_id"]
             st.session_state["selected_row_id"] = selected_idx
+
 
