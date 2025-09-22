@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Compte rendu visite</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .header img { max-height: 80px; }
+    h1 { 
+      text-align: center; 
+      text-transform: uppercase; 
+      font-weight: bold; 
+      font-size: 22px; /* tamaño mayor */
+      margin-bottom: 30px; 
+    }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #000; padding: 6px; text-align: left; font-size: 14px; }
+    .section { margin-top: 25px; }
+    .signatures td { height: 80px; vertical-align: top; }
+    .footer { margin-top: 40px; font-size: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <!-- Encabezado con logos -->
+  <div class="header">
+    <img src="header.png" alt="Logos ANER y Salvi">
+  </div>
+
+  <h1>COMPTE RENDU VISITE DE SITE – PROJET 100.000 LAMPADAIRES SOLAIRES</h1>
+
+  <div class="section">
+    <p><strong>Date :</strong> {{date}}</p>
+    <p><strong>Région-Département :</strong> {{region_departement}}</p>
+    <p><strong>Point Focal :</strong> {{point_focal}}</p>
+    <p><strong>Représentant ANER :</strong> {{rep_aner}}</p>
+    <p><strong>Représentant SALVI Sénégal :</strong> {{rep_salvi}}</p>
+  </div>
+
+  <div class="section">
+    <table>
+      <thead>
+        <tr>
+          <th>Commune</th>
+          <th>N° Axe</th>
+          <th>Nom Axe</th>
+          <th>Nombre de lampadaires affectés</th>
+        </tr>
+      </thead>
+      <tbody id="table-rows">
+        <!-- Filas dinámicas -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <p><strong>Total lampadaires attribués à la commune :</strong> {{total_commune}}</p>
+    <p><strong>Total lampadaires affectés à la suite des visites :</strong> {{total_affectes}}</p>
+    <p><strong>Restants/Surplus :</strong> {{surplus}}</p>
+  </div>
+
+  <div class="section">
+    <p>
+      Les représentants des trois entités Point focal/ANER/SALVI Sénégal reconnaissent avoir visité et validé l’implantation de lampadaires solaires dans le cadre du projet d’installation des 100 000 lampadaires solaires de l’ANER au niveau des axes listés ci-dessus.
+    </p>
+  </div>
+
+  <div class="section">
+    <p><strong>Observation(s) globale(s) à la suite des visites :</strong></p>
+    <p>{{observations}}</p>
+  </div>
+
+  <div class="section">
+    <table class="signatures">
+      <tr>
+        <th>Le représentant de SALVI</th>
+        <th>Le représentant de l’ANER</th>
+        <th>Le Préfet/Sous-Préfet</th>
+      </tr>
+      <tr>
+        <td>Nom : {{nom_salvi}}<br>Le : {{date_salvi}}<br>Signature + Cachet :</td>
+        <td>Nom : {{nom_aner}}<br>Le : {{date_aner}}<br>Signature + Cachet :</td>
+        <td>Nom : {{nom_prefet}}<br>Le : {{date_prefet}}<br>Signature + Cachet :</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    RCCM No SN-KLK-2022-B 2751 - NINEA No 009538177,<br>
+    BP: 302, Léona Rue Amilcar Cabral, KAOLACK/SÉNÉGAL,<br>
+    Website: <a href="https://www.salvi.sn">www.salvi.sn</a><br>
+    Page {{page_num}} sur {{page_total}}
+  </div>
+</body>
+</html>
