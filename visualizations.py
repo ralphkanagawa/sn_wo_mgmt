@@ -8,6 +8,12 @@ from streamlit_folium import st_folium
 import pandas as pd
 import streamlit as st
 
+import folium
+from folium.plugins import MarkerCluster
+from streamlit_folium import st_folium
+import pandas as pd
+import streamlit as st
+
 def render_map():
     if "latest_edited" not in st.session_state or st.session_state.latest_edited.empty:
         return
@@ -34,13 +40,8 @@ def render_map():
         else:
             return "red"
 
-    # posiciones alternas para evitar solapamiento
-    offsets = [
-        "margin-left: 10px;",   # derecha
-        "margin-right: 10px;",  # izquierda
-        "margin-top: -15px;",   # arriba
-        "margin-top: 12px;",    # abajo
-    ]
+    # Crear clúster
+    cluster = MarkerCluster().add_to(m)
 
     for _, row in df.iterrows():
         lat = row["Latitude - Functional Location"]
@@ -49,22 +50,19 @@ def render_map():
         row_id = row["row_id"]
         point_id = row.get("ID point", row_id)
 
-        style = offsets[row_id % len(offsets)]
-
-        # Etiqueta con desplazamiento
+        # Marcador con número
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(
                 html=f"""
                 <div style="font-size: 13px; font-weight: bold; color: black;
                             text-shadow: -1px -1px 0 white, 1px -1px 0 white,
-                                         -1px 1px 0 white, 1px 1px 0 white;
-                            {style}">
+                                         -1px 1px 0 white, 1px 1px 0 white;">
                     {point_id}
                 </div>
                 """
             )
-        ).add_to(m)
+        ).add_to(cluster)
 
         # Círculo de color
         folium.CircleMarker(
