@@ -114,7 +114,7 @@ with tab1:
         invalid_mask["Name - Child Functional Location"] = ~edited["Name - Child Functional Location"].isin(all_children)
 
     if invalid_mask.any().any():
-        st.warning("⚠️ Invalid cell values have been detected. Please review the content before exporting.")
+        #st.warning("⚠️ Invalid cell values have been detected. Please review the content before exporting.")
 
     st.session_state.latest_edited = edited.copy()
 
