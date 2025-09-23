@@ -126,7 +126,7 @@ with tab1:
     # Mostrar fila seleccionada desde el mapa
     if "selected_row_id" in st.session_state:
         selected_id = st.session_state["selected_row_id"]
-        st.markdown(f"<span style='color:green;'>🟢 Selected point: row {selected_id + 1}</span>", unsafe_allow_html=True)
+        
 
 
     col_spacer, col1, col_spacer, col2, col_spacer, col3, col_spacer = st.columns([2, 3, 2, 3, 2, 3, 2])
