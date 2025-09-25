@@ -101,6 +101,14 @@ with tab1:
         num_rows="dynamic",
         use_container_width=True,
         key="editor"
+        column_config={
+        "Latitude - Functional Location": st.column_config.NumberColumn(
+            format="%.15f"
+        ),
+        "Longitude - Functional Location": st.column_config.NumberColumn(
+            format="%.15f"
+        ),
+    },
     )
 
     # Validación
