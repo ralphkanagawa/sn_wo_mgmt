@@ -63,7 +63,7 @@ with tab1:
         else:
             st.stop()
 
-    disp = st.session_state.df.copy()
+        disp = st.session_state.df.copy()
 
     # Añadir columna 'ID point'
     if "ID point" not in disp.columns:
@@ -75,19 +75,45 @@ with tab1:
 
     disp = disp[["ID point"] + [col for col in template_cols if col != "ID point"]]
 
-    st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
+    # Guardar todos los datos (todas las columnas)
+    if st.session_state.edited_df.empty:
+        st.session_state.edited_df = disp
 
-    col_left, col_spacer, col_right = st.columns([3, 12, 2])
+    # --- Filtrar columnas visibles solo para la vista ---
+    if visible_cols:
+        keep = ["ID point"] + [c for c in visible_cols if c in disp.columns]
+        disp_view = st.session_state.edited_df[keep].copy()
+    else:
+        disp_view = st.session_state.edited_df.copy()
 
-    with col_left:
-        if st.button("🔁 Reload files"):
-            for key in ["processed", "df", "geo_df", "cov_df", "edited_df", "latest_edited"]:
-                st.session_state.pop(key, None)
-            st.rerun()
+    # Editor sobre solo columnas visibles
+    edited = st.data_editor(
+        disp_view,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor",
+        column_config={
+            **{
+                long: st.column_config.Column(label=short)
+                for long, short in column_aliases.items()
+                if long in disp_view.columns
+            },
+            "Latitude - Functional Location": st.column_config.NumberColumn(
+                format="%.15f", label="Lat"
+            ),
+            "Longitude - Functional Location": st.column_config.NumberColumn(
+                format="%.15f", label="Lon"
+            ),
+        },
+    )
 
-    with col_right:
-        if st.button("💾 Save changes"):
-            st.session_state.edited_df = st.session_state.latest_edited.copy()
+    # --- Merge de cambios en visibles hacia el dataframe completo ---
+    for col in disp_view.columns:
+        st.session_state.edited_df[col] = edited[col]
+
+    # Copia de seguridad
+    st.session_state.latest_edited = st.session_state.edited_df.copy()
+
 
     # --- ALIAS para nombres cortos solo en la web ---
     column_aliases = {
