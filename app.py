@@ -106,8 +106,9 @@ with tab1:
 
     # --- ALIAS para nombres cortos solo en la web ---
     column_aliases = {
-        "Latitude - Functional Location": "Lat",
-        "Longitude - Functional Location": "Lon",
+        "Latitude - Functional Location": "Latitude",
+        "Longitude - Functional Location": "Longitude",
+        "ID point": "ID",
         "Service Account - Work Order": "SvcAcc",
         "Work Order Type - Work Order": "WO Type",
         "Billing Account - Work Order": "BillAcc",
