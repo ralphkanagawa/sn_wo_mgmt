@@ -91,6 +91,18 @@ with tab1:
 
     # --- ALIAS para nombres cortos solo en la web ---
     column_aliases = {
+        "ID point": "ID",
+        "Service Address - Functional Location": "Address",
+        "City - Functional Location": "City",
+        "State/Province - Functional Location": "Province",
+        "Postal Code - Functional Location": "Postal",
+        "Country/Region - Functional Location": "Region",
+        "Driver - Work Order": "Driver",
+        "Trailer - Work Order": "Trailer",
+        "Destination Warehouse - Work Order": "Dest. WH",
+        "Summary - Work Order": "Summary",
+        "Account Instructions - Work Order": "Acc. Instruc.",
+        
         "Latitude - Functional Location": "Lat",
         "Longitude - Functional Location": "Lon",
         "Service Account - Work Order": "SvcAcc",
