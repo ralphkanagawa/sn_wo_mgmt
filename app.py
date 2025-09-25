@@ -95,14 +95,14 @@ with tab1:
         "Service Address - Functional Location": "Address",
         "City - Functional Location": "City",
         "State/Province - Fuctional Location": "Province",
-        "Postal Code - Functional Location": "Postal",
+        "Postal Code - Fuctional Location": "Postal",
         "Country/Region - Functional Location": "Region",
         "Driver - Work Order": "Driver",
         "Trailer - Work Order": "Trailer",
         "Destination Warehouse - Work Order": "Dest. WH",
         "Summary - Work Order": "Summary",
         "Account Instructions - Work Order": "Acc. Instruc.",
-        
+
         "Latitude - Functional Location": "Lat",
         "Longitude - Functional Location": "Lon",
         "Service Account - Work Order": "SvcAcc",
@@ -119,6 +119,7 @@ with tab1:
         "Incident Type - Work Order": "Incident",
         "Owner - Work Order": "Owner",
         "Name - Bookable Resource Booking": "Resource",
+        "Gateway": "GW",
     }
 
     # Editor con nombres cortos
