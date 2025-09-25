@@ -320,12 +320,6 @@ with tab2:
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
 
-    def render_pdf(template_path, context, output_path):
-        with open(template_path, "r", encoding="utf-8") as f:
-            html = Template(f.read()).render(**context)
-        with open(output_path, "wb") as f:
-            pisa.CreatePDF(html, dest=f)
-
     def render_docx(template_path, context, output_path="informe.docx"):
         with open(template_path, "r", encoding="utf-8") as f:
             html = Template(f.read()).render(**context)
@@ -383,13 +377,8 @@ with tab2:
         }
 
         # Botones de exportación
-        colb1, colb2 = st.columns(2)
+        colb1 = st.columns(1)
         with colb1:
-            if st.button("📄 Generate Report PDF"):
-                render_pdf("report_template.html", {**context, **report_meta}, "informe.pdf")
-                with open("informe.pdf", "rb") as f:
-                    st.download_button("⬇️ Download Report PDF", f, file_name="report.pdf", mime="application/pdf")
-        with colb2:
             if st.button("📄 Generate Report DOCX"):
                 render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
                 with open("informe.docx", "rb") as f:
