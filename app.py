@@ -94,7 +94,7 @@ with tab1:
         "ID point": "ID",
         "Service Address - Functional Location": "Address",
         "City - Functional Location": "City",
-        "State/Province - Functional Location": "Province",
+        "State/Province - Fuctional Location": "Province",
         "Postal Code - Functional Location": "Postal",
         "Country/Region - Functional Location": "Region",
         "Driver - Work Order": "Driver",
