@@ -100,7 +100,7 @@ with tab1:
         st.session_state.edited_df,
         num_rows="dynamic",
         use_container_width=True,
-        key="editor"
+        key="editor",
         column_config={
         "Latitude - Functional Location": st.column_config.NumberColumn(
             format="%.15f"
