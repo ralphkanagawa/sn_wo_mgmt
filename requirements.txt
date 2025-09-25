@@ -4,7 +4,6 @@ openpyxl>=3.1
 pydeck>=0.8
 matplotlib
 jinja2
-xhtml2pdf
 contextily
 geopy
 scipy>=1.10
