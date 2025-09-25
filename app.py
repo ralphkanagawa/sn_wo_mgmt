@@ -332,58 +332,57 @@ with tab2:
         return df[col].dropna().unique().tolist() if col in df.columns else []
 
     # --- Generación de reportes ---
-    if st.session_state.edited_df.empty:
-        st.warning("No data available. Please, load and edit on the Work Order Management tab.")
-    else:
-        df_full = st.session_state.df.copy()
-        save_geoposition_map(df_full, "map_contextual.png")
+if st.session_state.edited_df.empty:
+    st.warning("No data available. Please, load and edit on the Work Order Management tab.")
+else:
+    df_full = st.session_state.df.copy()
+    save_geoposition_map(df_full, "map_contextual.png")
 
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.image("map_contextual.png", use_container_width=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("map_contextual.png", use_container_width=True)
 
-        # Recalcular contexto
-        calles_validas = df_full["Latitude - Functional Location"].notna()
-        total_ordenes = len(df_full)
-        total_yes = (df_full["Gateway"] == "YES").sum()
-        total_no = (df_full["Gateway"] == "NO").sum()
+    # Recalcular contexto
+    calles_validas = df_full["Latitude - Functional Location"].notna()
+    total_ordenes = len(df_full)
+    total_yes = (df_full["Gateway"] == "YES").sum()
+    total_no = (df_full["Gateway"] == "NO").sum()
 
-        context = {
-            "fecha": datetime.now().strftime("%d/%m/%Y"),
-            "total_ordenes": total_ordenes,
-            "total_yes": total_yes,
-            "total_no": total_no,
-            "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
-            "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
-        }
+    context = {
+        "fecha": datetime.now().strftime("%d/%m/%Y"),
+        "total_ordenes": total_ordenes,
+        "total_yes": total_yes,
+        "total_no": total_no,
+        "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
+        "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
+    }
 
-        # Inputs adicionales para DOCX
-        report_meta = {
-            "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
-            "region_departement": st.text_input("Région–Département"),
-            "point_focal": st.text_input("Point Focal"),
-            "rep_aner": st.text_input("Représentant ANER"),
-            "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
-            "total_commune": st.text_input("Total lampadaires attribués à la commune"),
-            "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
-            "surplus": st.text_input("Restants/Surplus"),
-            "observations": st.text_area("Observations globales"),
-            "nom_salvi": st.text_input("Nom représentant SALVI"),
-            "date_salvi": st.text_input("Date SALVI"),
-            "nom_aner": st.text_input("Nom représentant ANER"),
-            "date_aner": st.text_input("Date ANER"),
-            "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
-            "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
-        }
+    # Inputs adicionales para DOCX
+    report_meta = {
+        "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
+        "region_departement": st.text_input("Région–Département"),
+        "point_focal": st.text_input("Point Focal"),
+        "rep_aner": st.text_input("Représentant ANER"),
+        "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
+        "total_commune": st.text_input("Total lampadaires attribués à la commune"),
+        "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
+        "surplus": st.text_input("Restants/Surplus"),
+        "observations": st.text_area("Observations globales"),
+        "nom_salvi": st.text_input("Nom représentant SALVI"),
+        "date_salvi": st.text_input("Date SALVI"),
+        "nom_aner": st.text_input("Nom représentant ANER"),
+        "date_aner": st.text_input("Date ANER"),
+        "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
+        "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
+    }
 
-        # Botones de exportación
-            if st.button("📄 Generate Report DOCX"):
-                render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
-                with open("informe.docx", "rb") as f:
-                    st.download_button("⬇️ Download Report DOCX", f, file_name="report.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-        st.markdown(
-            "<div style='text-align: center; color: gray; font-size: 0.875rem;'>Developed in Streamlit by CM SALVI • 2025</div>",
-            unsafe_allow_html=True
-        )
-
+    # Botón único de exportación DOCX
+    if st.button("📄 Generate Report DOCX"):
+        render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
+        with open("informe.docx", "rb") as f:
+            st.download_button(
+                "⬇️ Download Report DOCX",
+                f,
+                file_name="report.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
