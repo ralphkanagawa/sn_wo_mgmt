@@ -377,8 +377,6 @@ with tab2:
         }
 
         # Botones de exportación
-        colb1 = st.columns(1)
-        with colb1:
             if st.button("📄 Generate Report DOCX"):
                 render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
                 with open("informe.docx", "rb") as f:
