@@ -75,12 +75,6 @@ with tab1:
 
     disp = disp[["ID point"] + [col for col in template_cols if col != "ID point"]]
 
-    # --- NUEVO: limitar al conjunto visible si está definido ---
-    #if visible_cols:
-        # Siempre conservar ID point aunque no esté en visibles
-        #keep = ["ID point"] + [c for c in visible_cols if c in disp.columns]
-        #disp = disp[keep]
-
     st.session_state.edited_df = disp if st.session_state.edited_df.empty else st.session_state.edited_df
 
     col_left, col_spacer, col_right = st.columns([3, 12, 2])
@@ -95,20 +89,45 @@ with tab1:
         if st.button("💾 Save changes"):
             st.session_state.edited_df = st.session_state.latest_edited.copy()
 
-    # Editor
+    # --- ALIAS para nombres cortos solo en la web ---
+    column_aliases = {
+        "Latitude - Functional Location": "Lat",
+        "Longitude - Functional Location": "Lon",
+        "Service Account - Work Order": "SvcAcc",
+        "Work Order Type - Work Order": "WO Type",
+        "Billing Account - Work Order": "BillAcc",
+        "Promised window From - Work Order": "From",
+        "Promised window To - Work Order": "To",
+        "StartTime - Bookable Resource Booking": "Start",
+        "EndTime - Bookable Resource Booking": "End",
+        "Time window From - Work Order": "T From",
+        "Time window To - Work Order": "T To",
+        "Name - Parent Functional Location": "Parent",
+        "Name - Child Functional Location": "Child",
+        "Incident Type - Work Order": "Incident",
+        "Owner - Work Order": "Owner",
+        "Name - Bookable Resource Booking": "Resource",
+    }
+
+    # Editor con nombres cortos
     edited = st.data_editor(
         st.session_state.edited_df,
         num_rows="dynamic",
         use_container_width=True,
         key="editor",
         column_config={
-        "Latitude - Functional Location": st.column_config.NumberColumn(
-            format="%.15f"
-        ),
-        "Longitude - Functional Location": st.column_config.NumberColumn(
-            format="%.15f"
-        ),
-    },
+            **{
+                long: st.column_config.Column(label=short)
+                for long, short in column_aliases.items()
+                if long in st.session_state.edited_df.columns
+            },
+            "Latitude - Functional Location": st.column_config.NumberColumn(
+                format="%.15f", label="Lat"
+            ),
+            "Longitude - Functional Location": st.column_config.NumberColumn(
+                format="%.15f", label="Lon"
+            ),
+        },
     )
 
     # Validación
