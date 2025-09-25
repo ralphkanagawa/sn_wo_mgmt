@@ -63,7 +63,7 @@ with tab1:
         else:
             st.stop()
 
-    disp = st.session_state.df.copy()
+        disp = st.session_state.df.copy()
 
     # Añadir columna 'ID point'
     if "ID point" not in disp.columns:
