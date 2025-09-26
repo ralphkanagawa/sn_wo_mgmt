@@ -369,12 +369,6 @@ with tab2:
         }
 
         # Botones de exportación
-        colb1, colb2 = st.columns(2)
-        with colb1:
-            if st.button("📄 Generate Report PDF"):
-                render_pdf("report_template.html", {**context, **report_meta}, "informe.pdf")
-                with open("informe.pdf", "rb") as f:
-                    st.download_button("⬇️ Download Report PDF", f, file_name="report.pdf", mime="application/pdf")
         with colb2:
             if st.button("📄 Generate Report DOCX"):
                 render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
