@@ -369,11 +369,10 @@ with tab2:
         }
 
         # Botones de exportación
-        with colb2:
-            if st.button("📄 Generate Report DOCX"):
-                render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
-                with open("informe.docx", "rb") as f:
-                    st.download_button("⬇️ Download Report DOCX", f, file_name="report.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        if st.button("📄 Generate Report DOCX"):
+            render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
+            with open("informe.docx", "rb") as f:
+                st.download_button("⬇️ Download Report DOCX", f, file_name="report.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
         st.markdown(
             "<div style='text-align: center; color: gray; font-size: 0.875rem;'>Developed in Streamlit by CM SALVI • 2025</div>",
