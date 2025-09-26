@@ -258,7 +258,6 @@ with tab1:
 
 with tab2:
     from jinja2 import Template
-    from xhtml2pdf import pisa
     import contextily as ctx
     import matplotlib.pyplot as plt
     from htmldocx import HtmlToDocx
