@@ -91,8 +91,6 @@ def render_map():
             popup=f"ID point: {point_id} | dBm: {dbm}",
         ).add_to(m)
 
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
         map_data = st_folium(m, width=1200, height=800)
 
     if map_data and map_data.get("last_clicked"):
