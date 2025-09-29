@@ -18,7 +18,30 @@ def render_map():
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
-    m = folium.Map(location=[lat_center, lon_center], zoom_start=16)
+    # --- Nuevo: selector de tiles ---
+    tile_option = st.selectbox(
+        "🌍 Select basemap",
+        [
+            "OpenStreetMap",
+            "CartoDB Positron",
+            "CartoDB Dark_Matter",
+            "Stamen Terrain",
+            "Stamen Toner",
+            "Esri Satellite"
+        ]
+    )
+
+    tile_providers = {
+        "OpenStreetMap": "OpenStreetMap",
+        "CartoDB Positron": "CartoDB positron",
+        "CartoDB Dark_Matter": "CartoDB dark_matter",
+        "Stamen Terrain": "Stamen Terrain",
+        "Stamen Toner": "Stamen Toner",
+        "Esri Satellite": "Esri.WorldImagery",
+    }
+
+    m = folium.Map(location=[lat_center, lon_center], zoom_start=16, tiles=None)
+    folium.TileLayer(tile_providers[tile_option]).add_to(m)
 
     def color_from_dbm(dBm):
         if pd.isna(dBm):
@@ -30,15 +53,13 @@ def render_map():
         else:
             return "red"
 
-    # Crear clúster
     cluster = MarkerCluster().add_to(m)
 
-    # Definir offsets para repartir etiquetas alrededor
     offsets = [
-        "transform: translate(12px, 0);",     # derecha
-        "transform: translate(-22px, 0);",    # izquierda
-        "transform: translate(0, -18px);",    # arriba
-        "transform: translate(0, 12px);"      # abajo
+        "transform: translate(12px, 0);",
+        "transform: translate(-22px, 0);",
+        "transform: translate(0, -18px);",
+        "transform: translate(0, 12px);"
     ]
 
     for _, row in df.iterrows():
@@ -50,7 +71,6 @@ def render_map():
 
         style = offsets[row_id % len(offsets)]
 
-        # Marcador con número, desplazado según offset
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(
@@ -65,7 +85,6 @@ def render_map():
             )
         ).add_to(cluster)
 
-        # Círculo de color
         folium.CircleMarker(
             location=[lat, lon],
             radius=6,
