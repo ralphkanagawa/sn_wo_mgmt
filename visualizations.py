@@ -25,8 +25,6 @@ def render_map():
             "OpenStreetMap",
             "CartoDB Positron",
             "CartoDB Dark_Matter",
-            "Stamen Terrain",
-            "Stamen Toner",
             "Esri Satellite"
         ]
     )
@@ -35,8 +33,6 @@ def render_map():
         "OpenStreetMap": "OpenStreetMap",
         "CartoDB Positron": "CartoDB positron",
         "CartoDB Dark_Matter": "CartoDB dark_matter",
-        "Stamen Terrain": "Stamen Terrain",
-        "Stamen Toner": "Stamen Toner",
         "Esri Satellite": "Esri.WorldImagery",
     }
 
