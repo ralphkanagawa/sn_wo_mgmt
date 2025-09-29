@@ -93,7 +93,7 @@ def render_map():
 
     col1, col2, col3 = st.columns([1, 3, 1])
     with col2:
-        map_data = st_folium(m, width=900, height=600)
+        map_data = st_folium(m, width=1200, height=800)
 
     if map_data and map_data.get("last_clicked"):
         clicked = map_data["last_clicked"]
