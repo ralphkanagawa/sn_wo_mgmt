@@ -257,10 +257,8 @@ with tab1:
 ###########################################
 
 with tab2:
-    from jinja2 import Template
     import contextily as ctx
     import matplotlib.pyplot as plt
-    from htmldocx import HtmlToDocx
 
     # --- Funciones auxiliares ---
     def save_geoposition_map(df, path="map_contextual.png"):
@@ -306,20 +304,6 @@ with tab2:
         plt.tight_layout()
         plt.savefig(path, bbox_inches="tight", pad_inches=0)
         plt.close()
-
-    def render_pdf(template_path, context, output_path):
-        with open(template_path, "r", encoding="utf-8") as f:
-            html = Template(f.read()).render(**context)
-        with open(output_path, "wb") as f:
-            pisa.CreatePDF(html, dest=f)
-
-    def render_docx(template_path, context, output_path="informe.docx"):
-        with open(template_path, "r", encoding="utf-8") as f:
-            html = Template(f.read()).render(**context)
-        doc = Document()
-        parser = HtmlToDocx()
-        parser.add_html_to_document(html, doc)
-        doc.save(output_path)
 
     def safe_unique(df, col):
         return df[col].dropna().unique().tolist() if col in df.columns else []
@@ -370,9 +354,7 @@ with tab2:
 
         # Botones de exportación
         if st.button("📄 Generate Report DOCX"):
-            render_docx("report_template_docx.html", {**context, **report_meta}, "informe.docx")
-            with open("informe.docx", "rb") as f:
-                st.download_button("⬇️ Download Report DOCX", f, file_name="report.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            st.info("Funcionalidad pendiente de implementar con python-docx-template")
 
         st.markdown(
             "<div style='text-align: center; color: gray; font-size: 0.875rem;'>Developed in Streamlit by CM SALVI • 2025</div>",
