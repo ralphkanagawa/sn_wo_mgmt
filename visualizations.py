@@ -52,7 +52,7 @@ def render_map():
     if tile_option == "OpenStreetMap":
         cluster = MarkerCluster(disableClusteringAtZoom=18).add_to(m)
     elif tile_option == "Mapbox Satellite":
-        cluster = MarkerCluster(disableClusteringAtZoom=18).add_to(m)
+        cluster = MarkerCluster(disableClusteringAtZoom=17).add_to(m)
     else:
         cluster = MarkerCluster().add_to(m)
 
