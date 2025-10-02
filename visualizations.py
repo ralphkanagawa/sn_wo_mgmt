@@ -18,14 +18,19 @@ def render_map():
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
-    # --- Nuevo: selector de tiles ---
+    # --- NUEVO: selector de tiles con Azure y Mapbox ---
+    AZURE_KEY = "PON_AQUI_TU_AZURE_KEY"
+    MAPBOX_TOKEN = "PON_AQUI_TU_MAPBOX_TOKEN"
+
     tile_option = st.selectbox(
         "🌍 Select basemap",
         [
             "OpenStreetMap",
             "CartoDB Positron",
             "CartoDB Dark_Matter",
-            "Esri Satellite"
+            "Esri Satellite",
+            "Azure Aerial",
+            "Mapbox Satellite"
         ]
     )
 
@@ -34,10 +39,25 @@ def render_map():
         "CartoDB Positron": "CartoDB positron",
         "CartoDB Dark_Matter": "CartoDB dark_matter",
         "Esri Satellite": "Esri.WorldImagery",
+        "Azure Aerial": f"https://atlas.microsoft.com/map/tile"
+                        f"?subscription-key={AZURE_KEY}&api-version=2.1"
+                        f"&tilesetId=microsoft.imagery&zoom={{z}}&x={{x}}&y={{y}}",
+        "Mapbox Satellite": f"https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/"
+                            f"{{z}}/{{x}}/{{y}}?access_token={MAPBOX_TOKEN}"
     }
 
     m = folium.Map(location=[lat_center, lon_center], zoom_start=16, tiles=None)
-    folium.TileLayer(tile_providers[tile_option]).add_to(m)
+
+    if tile_option in ["Azure Aerial", "Mapbox Satellite"]:
+        folium.TileLayer(
+            tiles=tile_providers[tile_option],
+            attr=tile_option,
+            name=tile_option,
+            overlay=False,
+            control=True
+        ).add_to(m)
+    else:
+        folium.TileLayer(tile_providers[tile_option]).add_to(m)
 
     def color_from_dbm(dBm):
         if pd.isna(dBm):
