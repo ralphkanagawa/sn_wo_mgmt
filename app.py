@@ -352,9 +352,57 @@ with tab2:
             "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
         }
 
-        # Botones de exportación
+        from docxtpl import DocxTemplate
+
         if st.button("📄 Generate Report DOCX"):
-            st.info("Funcionalidad pendiente de implementar con python-docx-template")
+            # Cargar plantilla Word con placeholders
+            doc = DocxTemplate("report_template.docx")
+        
+            # Construir datos de la tabla (ejemplo simple con todo el df)
+            axes = []
+            for _, r in df_full.iterrows():
+                axes.append({
+                    "commune": r.get("Name - Parent Functional Location", ""),
+                    "axe": r.get("Name - Child Functional Location", ""),
+                    "nom_axe": f"{r.get('Latitude - Functional Location','')}, {r.get('Longitude - Functional Location','')}",
+                    "nb": 1  # Aquí pones el cálculo real de lampadaires
+                })
+        
+            # Contexto para la plantilla
+            context_tpl = {
+                "date": report_meta["date"],
+                "region_departement": report_meta["region_departement"],
+                "point_focal": report_meta["point_focal"],
+                "rep_aner": report_meta["rep_aner"],
+                "rep_salvi": report_meta["rep_salvi"],
+                "total_commune": report_meta["total_commune"],
+                "total_affectes": report_meta["total_affectes"],
+                "surplus": report_meta["surplus"],
+                "observations": report_meta["observations"],
+                "nom_salvi": report_meta["nom_salvi"],
+                "date_salvi": report_meta["date_salvi"],
+                "nom_aner": report_meta["nom_aner"],
+                "date_aner": report_meta["date_aner"],
+                "nom_prefet": report_meta["nom_prefet"],
+                "date_prefet": report_meta["date_prefet"],
+                "axes": axes
+            }
+        
+            # Renderizar plantilla
+            doc.render(context_tpl)
+        
+            # Guardar en archivo temporal
+            output_path = "informe.docx"
+            doc.save(output_path)
+        
+            # Botón de descarga
+            with open(output_path, "rb") as f:
+                st.download_button(
+                    "⬇️ Download Report DOCX",
+                    f,
+                    file_name="report.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
 
         st.markdown(
             "<div style='text-align: center; color: gray; font-size: 0.875rem;'>Developed in Streamlit by CM SALVI • 2025</div>",
