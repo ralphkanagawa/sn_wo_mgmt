@@ -379,12 +379,8 @@ with tab2:
                 "total_affectes": report_meta["total_affectes"],
                 "surplus": report_meta["surplus"],
                 "observations": report_meta["observations"],
-                "nom_salvi": report_meta["nom_salvi"],
                 "date_salvi": report_meta["date_salvi"],
-                "nom_aner": report_meta["nom_aner"],
                 "date_aner": report_meta["date_aner"],
-                "nom_prefet": report_meta["nom_prefet"],
-                "date_prefet": report_meta["date_prefet"],
                 "axes": axes
             }
         
