@@ -18,19 +18,30 @@ def render_map():
     lat_center = df["Latitude - Functional Location"].mean()
     lon_center = df["Longitude - Functional Location"].mean()
 
-    # --- NUEVO: selector de tiles Mapbox ---
-    MAPBOX_TOKEN = "pk.eyJ1IjoiaXRzZW5lZ2FsIiwiYSI6ImNtZzlnd3E4cjBmZnoya3M3d2ZpNWkwM3QifQ.4JT8F_EIMJnur_YSFc40Tw"
+    # --- NUEVO: selector de tiles con Azure y Mapbox ---
+    AZURE_KEY = "PON_AQUI_TU_AZURE_KEY"
+    MAPBOX_TOKEN = "PON_AQUI_TU_MAPBOX_TOKEN"
 
     tile_option = st.selectbox(
         "🌍 Select basemap",
         [
             "OpenStreetMap",
+            "CartoDB Positron",
+            "CartoDB Dark_Matter",
+            "Esri Satellite",
+            "Azure Aerial",
             "Mapbox Satellite"
         ]
     )
 
     tile_providers = {
         "OpenStreetMap": "OpenStreetMap",
+        "CartoDB Positron": "CartoDB positron",
+        "CartoDB Dark_Matter": "CartoDB dark_matter",
+        "Esri Satellite": "Esri.WorldImagery",
+        "Azure Aerial": f"https://atlas.microsoft.com/map/tile"
+                        f"?subscription-key={AZURE_KEY}&api-version=2.1"
+                        f"&tilesetId=microsoft.imagery&zoom={{z}}&x={{x}}&y={{y}}",
         "Mapbox Satellite": f"https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/"
                             f"{{z}}/{{x}}/{{y}}?access_token={MAPBOX_TOKEN}"
     }
@@ -48,6 +59,14 @@ def render_map():
     else:
         folium.TileLayer(tile_providers[tile_option]).add_to(m)
 
+    # --- Clustering diferenciado por proveedor ---
+    if tile_option == "OpenStreetMap":
+        cluster = MarkerCluster(disableClusteringAtZoom=18).add_to(m)
+    elif tile_option == "Mapbox Satellite":
+        cluster = MarkerCluster(disableClusteringAtZoom=21).add_to(m)
+    else:
+        cluster = MarkerCluster().add_to(m)
+
     def color_from_dbm(dBm):
         if pd.isna(dBm):
             return "lightgray"
@@ -57,8 +76,6 @@ def render_map():
             return "orange"
         else:
             return "red"
-
-    cluster = MarkerCluster().add_to(m)
 
     offsets = [
         "transform: translate(12px, 0);",
