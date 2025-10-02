@@ -379,8 +379,6 @@ with tab2:
                 "total_affectes": report_meta["total_affectes"],
                 "surplus": report_meta["surplus"],
                 "observations": report_meta["observations"],
-                "date_salvi": report_meta["date_salvi"],
-                "date_aner": report_meta["date_aner"],
                 "axes": axes
             }
         
