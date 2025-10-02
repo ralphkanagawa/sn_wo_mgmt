@@ -20,7 +20,7 @@ def render_map():
 
     # --- NUEVO: selector de tiles con Azure y Mapbox ---
     AZURE_KEY = "PON_AQUI_TU_AZURE_KEY"
-    MAPBOX_TOKEN = "PON_AQUI_TU_MAPBOX_TOKEN"
+    MAPBOX_TOKEN = "pk.eyJ1IjoiaXRzZW5lZ2FsIiwiYSI6ImNtZzlnd3E4cjBmZnoya3M3d2ZpNWkwM3QifQ.4JT8F_EIMJnur_YSFc40Tw"
 
     tile_option = st.selectbox(
         "🌍 Select basemap",
