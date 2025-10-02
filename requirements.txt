@@ -13,4 +13,3 @@ streamlit-folium
 fastkml
 shapely
 python-docx
-htmldocx
