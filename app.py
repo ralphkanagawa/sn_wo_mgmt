@@ -333,6 +333,8 @@ with tab2:
             "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
         }
 
+        total_points = st.session_state.get("total_points", 0)
+        
         # Inputs adicionales para DOCX
         report_meta = {
             "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
