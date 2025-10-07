@@ -344,9 +344,7 @@ with tab2:
             "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
             "surplus": st.text_input("Restants/Surplus"),
             "observations": st.text_area("Observations globales"),
-            "nom_salvi": st.text_input("Nom représentant SALVI"),
             "date_salvi": st.text_input("Date SALVI"),
-            "nom_aner": st.text_input("Nom représentant ANER"),
             "date_aner": st.text_input("Date ANER"),
             "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
             "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
@@ -386,7 +384,9 @@ with tab2:
                 "observations": report_meta["observations"],
                 "axes": axes,
                 "nom_prefet": report_meta["nom_prefet"],
-                "date_prefet": report_meta["date_prefet"]
+                "date_prefet": report_meta["date_prefet"],
+                "date_aner": report_meta["date_aner"],
+                "date_salvi": report_meta["date_salvi"]
             }
         
             # Renderizar plantilla
