@@ -178,6 +178,11 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
 
     # --- NUEVO: total de puntos ---
     st.session_state.total_points = sum(st.session_state.points_per_file.values())
+    st.session_state["points_data"] = {
+        "per_file": st.session_state.points_per_file.copy(),
+        "total": st.session_state.total_points
+    }
+
 
     # Completar columnas necesarias
     geo_df["Service Account - Work Order"] = "ANER_Senegal"
