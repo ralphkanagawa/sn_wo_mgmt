@@ -389,7 +389,7 @@ with tab2:
                 "point_focal": report_meta["point_focal"],
                 "rep_aner": report_meta["rep_aner"],
                 "rep_salvi": report_meta["rep_salvi"],
-                "total_commune": report_meta["total_commune"],
+                "total_commune": report_meta["total_points"],
                 "total_affectes": report_meta["total_affectes"],
                 "surplus": report_meta["surplus"],
                 "observations": report_meta["observations"],
