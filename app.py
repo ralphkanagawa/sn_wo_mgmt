@@ -340,7 +340,7 @@ with tab2:
         
         with col1:
             date = st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y"))
-            region_departement = st.text_input("Région–Département")
+            region_departement = st.text_input("Région–Département", value=region_auto)
             point_focal = st.text_input("Point Focal")
             rep_aner = st.text_input("Représentant ANER")
             rep_salvi = st.text_input("Représentant SALVI Sénégal")
