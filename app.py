@@ -335,21 +335,45 @@ with tab2:
 
         total_points = st.session_state.get("total_points", 0)
         
-        # Inputs adicionales para DOCX
+        # --- Formulario distribuido en tres columnas ---
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            date = st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y"))
+            region_departement = st.text_input("Région–Département")
+            point_focal = st.text_input("Point Focal")
+            rep_aner = st.text_input("Représentant ANER")
+        
+        with col2:
+            rep_salvi = st.text_input("Représentant SALVI Sénégal")
+            total_commune = st.text_input(
+                "Total lampadaires attribués à la commune", 
+                value=str(total_points)
+            )
+            total_affectes = st.text_input("Total lampadaires affectés à la suite des visites")
+            surplus = st.text_input("Restants/Surplus")
+        
+        with col3:
+            observations = st.text_area("Observations globales")
+            date_salvi = st.text_input("Date SALVI")
+            date_aner = st.text_input("Date ANER")
+            nom_prefet = st.text_input("Nom Préfet/Sous-Préfet")
+            date_prefet = st.text_input("Date Préfet/Sous-Préfet")
+        
         report_meta = {
-            "date": st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y")),
-            "region_departement": st.text_input("Région–Département"),
-            "point_focal": st.text_input("Point Focal"),
-            "rep_aner": st.text_input("Représentant ANER"),
-            "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
-            "total_commune": st.text_input("Total lampadaires attribués à la commune", value=str(total_points)),
-            "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
-            "surplus": st.text_input("Restants/Surplus"),
-            "observations": st.text_area("Observations globales"),
-            "date_salvi": st.text_input("Date SALVI"),
-            "date_aner": st.text_input("Date ANER"),
-            "nom_prefet": st.text_input("Nom Préfet/Sous-Préfet"),
-            "date_prefet": st.text_input("Date Préfet/Sous-Préfet"),
+            "date": date,
+            "region_departement": region_departement,
+            "point_focal": point_focal,
+            "rep_aner": rep_aner,
+            "rep_salvi": rep_salvi,
+            "total_commune": total_commune,
+            "total_affectes": total_affectes,
+            "surplus": surplus,
+            "observations": observations,
+            "date_salvi": date_salvi,
+            "date_aner": date_aner,
+            "nom_prefet": nom_prefet,
+            "date_prefet": date_prefet,
         }
 
         from docxtpl import DocxTemplate
