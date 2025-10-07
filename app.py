@@ -358,18 +358,24 @@ with tab2:
         
             # --- NUEVO: resumen de puntos por fichero ---
             axes = []
-            points_info = getattr(st.session_state, "points_per_file", {})
+            
+            points_data = st.session_state.get("points_data", {})
+            points_info = points_data.get("per_file", {})
             
             if not points_info:
                 st.warning("No point count data found. Please process files first.")
             else:
+                parent_val = df_full["Name - Parent Functional Location"].iloc[0] if "Name - Parent Functional Location" in df_full.columns else ""
+                child_val = df_full["Name - Child Functional Location"].iloc[0] if "Name - Child Functional Location" in df_full.columns else ""
+            
                 for file_name, point_count in points_info.items():
                     axes.append({
-                        "commune": df_full["Name - Parent Functional Location"].iloc[0] if "Name - Parent Functional Location" in df_full.columns else "",
-                        "axe": df_full["Name - Child Functional Location"].iloc[0] if "Name - Child Functional Location" in df_full.columns else "",
+                        "commune": parent_val,
+                        "axe": child_val,
                         "nom_axe": file_name,
                         "nb": point_count
                     })
+
 
             # Contexto para la plantilla
             context_tpl = {
