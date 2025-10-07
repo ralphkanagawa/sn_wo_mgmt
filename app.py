@@ -323,19 +323,30 @@ with tab2:
         total_ordenes = len(df_full)
         total_yes = (df_full["Gateway"] == "YES").sum()
         total_no = (df_full["Gateway"] == "NO").sum()
-
+        
+        parent_locs = safe_unique(df_full, "Name - Parent Functional Location")
+        child_locs = safe_unique(df_full, "Name - Child Functional Location")
+        
+        region_auto = ""
+        if parent_locs and child_locs:
+            region_auto = f"{parent_locs[0]} – {child_locs[0]}"
+        elif parent_locs:
+            region_auto = parent_locs[0]
+        elif child_locs:
+            region_auto = child_locs[0]
+        
         context = {
             "fecha": datetime.now().strftime("%d/%m/%Y"),
             "total_ordenes": total_ordenes,
             "total_yes": total_yes,
             "total_no": total_no,
-            "parent_locations": safe_unique(df_full, "Name - Parent Functional Location"),
-            "child_locations": safe_unique(df_full, "Name - Child Functional Location"),
+            "parent_locations": parent_locs,
+            "child_locations": child_locs,
         }
-
+        
         total_points = st.session_state.get("total_points", 0)
         
-        # --- Formulario distribuido en tres columnas ---
+        # --- Formulario en 3 columnas ---
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -343,18 +354,17 @@ with tab2:
             region_departement = st.text_input("Région–Département", value=region_auto)
             point_focal = st.text_input("Point Focal")
             rep_aner = st.text_input("Représentant ANER")
-            rep_salvi = st.text_input("Représentant SALVI Sénégal")
         
         with col2:
+            rep_salvi = st.text_input("Représentant SALVI Sénégal")
             total_commune = st.text_input(
-                "Total lampadaires attribués à la commune", 
-                value=str(total_points)
+                "Total lampadaires attribués à la commune", value=str(total_points)
             )
             total_affectes = st.text_input("Total lampadaires affectés à la suite des visites")
             surplus = st.text_input("Restants/Surplus")
-            observations = st.text_area("Observations globales")
         
         with col3:
+            observations = st.text_area("Observations globales")
             date_salvi = st.text_input("Date SALVI")
             date_aner = st.text_input("Date ANER")
             nom_prefet = st.text_input("Nom Préfet/Sous-Préfet")
