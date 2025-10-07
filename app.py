@@ -358,16 +358,21 @@ with tab2:
             # Cargar plantilla Word con placeholders
             doc = DocxTemplate("report_template.docx")
         
-            # Construir datos de la tabla (ejemplo simple con todo el df)
+            # --- NUEVO: resumen de puntos por fichero ---
             axes = []
-            for _, r in df_full.iterrows():
-                axes.append({
-                    "commune": r.get("Name - Parent Functional Location", ""),
-                    "axe": r.get("Name - Child Functional Location", ""),
-                    "nom_axe": f"{r.get('Latitude - Functional Location','')}, {r.get('Longitude - Functional Location','')}",
-                    "nb": 1  # Aquí pones el cálculo real de lampadaires
-                })
-        
+            points_info = getattr(st.session_state, "points_per_file", {})
+            
+            if not points_info:
+                st.warning("No point count data found. Please process files first.")
+            else:
+                for file_name, point_count in points_info.items():
+                    axes.append({
+                        "commune": df_full["Name - Parent Functional Location"].iloc[0] if "Name - Parent Functional Location" in df_full.columns else "",
+                        "axe": df_full["Name - Child Functional Location"].iloc[0] if "Name - Child Functional Location" in df_full.columns else "",
+                        "nom_axe": file_name,
+                        "nb": point_count
+                    })
+
             # Contexto para la plantilla
             context_tpl = {
                 "date": report_meta["date"],
