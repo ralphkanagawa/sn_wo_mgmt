@@ -384,7 +384,9 @@ with tab2:
                 "total_affectes": report_meta["total_affectes"],
                 "surplus": report_meta["surplus"],
                 "observations": report_meta["observations"],
-                "axes": axes
+                "axes": axes,
+                "nom_prefet": report_meta["nom_prefet"],
+                "date_prefet": report_meta["date_prefet"]
             }
         
             # Renderizar plantilla
