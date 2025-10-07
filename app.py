@@ -343,18 +343,18 @@ with tab2:
             region_departement = st.text_input("Région–Département")
             point_focal = st.text_input("Point Focal")
             rep_aner = st.text_input("Représentant ANER")
+            rep_salvi = st.text_input("Représentant SALVI Sénégal")
         
         with col2:
-            rep_salvi = st.text_input("Représentant SALVI Sénégal")
             total_commune = st.text_input(
                 "Total lampadaires attribués à la commune", 
                 value=str(total_points)
             )
             total_affectes = st.text_input("Total lampadaires affectés à la suite des visites")
             surplus = st.text_input("Restants/Surplus")
+            observations = st.text_area("Observations globales")
         
         with col3:
-            observations = st.text_area("Observations globales")
             date_salvi = st.text_input("Date SALVI")
             date_aner = st.text_input("Date ANER")
             nom_prefet = st.text_input("Nom Préfet/Sous-Préfet")
