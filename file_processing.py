@@ -145,8 +145,13 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
     frames = []
     parents_detectados = set()
 
+    # --- NUEVO: registrar número de puntos por fichero ---
+    st.session_state.points_per_file = {}
+
     for f in files:
         df_tmp = load_georadar_file(f)
+        num_points = len(df_tmp)
+        st.session_state.points_per_file[getattr(f, "name", str(f))] = num_points
 
         # Detectar Parent y Child desde el nombre
         fname = getattr(f, "name", str(f))
@@ -170,6 +175,9 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
         st.stop()
 
     geo_df = pd.concat(frames, ignore_index=True)
+
+    # --- NUEVO: total de puntos ---
+    st.session_state.total_points = sum(st.session_state.points_per_file.values())
 
     # Completar columnas necesarias
     geo_df["Service Account - Work Order"] = "ANER_Senegal"
@@ -201,3 +209,12 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
     st.session_state.df = geo_df.copy()
     st.session_state.geo_df = geo_df.copy()
     st.session_state.processed = True
+
+    # --- NUEVO: mostrar resumen en la app ---
+    st.success("✅ Files processed successfully.")
+    st.write("### Points per file")
+    points_summary = pd.DataFrame.from_dict(
+        st.session_state.points_per_file, orient="index", columns=["Points"]
+    )
+    st.dataframe(points_summary)
+    st.write(f"**Total points:** {st.session_state.total_points}")
