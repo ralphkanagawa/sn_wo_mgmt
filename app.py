@@ -342,7 +342,7 @@ with tab2:
             "point_focal": st.text_input("Point Focal"),
             "rep_aner": st.text_input("Représentant ANER"),
             "rep_salvi": st.text_input("Représentant SALVI Sénégal"),
-            "total_commune": st.text_input("Total lampadaires attribués à la commune" value=str(total_points)),
+            "total_commune": st.text_input("Total lampadaires attribués à la commune", value=str(total_points)),
             "total_affectes": st.text_input("Total lampadaires affectés à la suite des visites"),
             "surplus": st.text_input("Restants/Surplus"),
             "observations": st.text_area("Observations globales"),
