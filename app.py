@@ -378,6 +378,9 @@ with tab2:
                         "nb": point_count
                     })
 
+                # Mostrar lo que se va a exportar
+                st.write("### Puntos que se incluirán en el informe")
+                st.dataframe(pd.DataFrame(axes))
 
             # Contexto para la plantilla
             context_tpl = {
