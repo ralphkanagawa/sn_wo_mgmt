@@ -389,7 +389,7 @@ with tab2:
                 "point_focal": report_meta["point_focal"],
                 "rep_aner": report_meta["rep_aner"],
                 "rep_salvi": report_meta["rep_salvi"],
-                "total_commune": st.session_state.get["total_points"],
+                "total_commune": st.session_state.get("total_points", 0),
                 "total_affectes": report_meta["total_affectes"],
                 "surplus": report_meta["surplus"],
                 "observations": report_meta["observations"],
