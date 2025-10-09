@@ -208,7 +208,7 @@ def load_and_process_files(geo_files, cov_file=None, config=None):
             geo_df["dBm"] = pd.NA
         if "Gateway" not in geo_df.columns:
             geo_df["Gateway"] = pd.NA
-        st.info("Only Georadar file uploaded, a Coverage file hasn't been uploaded.")
+        #st.info("Only Georadar file uploaded, a Coverage file hasn't been uploaded.")
 
     # Guardar en estado
     st.session_state.df = geo_df.copy()
