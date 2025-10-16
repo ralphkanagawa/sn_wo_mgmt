@@ -73,10 +73,21 @@ def parse_kml_data(kml_bytes):
                     })
 
     if not puntos:
-        st.error("❌ No valid coordinates found in KML after filtering.")
+        st.warning("⚠️ No coordinates matched filters. Debug info below:")
+        placemarks = root.findall(".//kml:Placemark", ns)
+        info = []
+        for p in placemarks:
+            n = p.find("kml:name", ns)
+            d = p.find("kml:description", ns)
+            s = p.find("kml:styleUrl", ns)
+            info.append({
+                "name": n.text if n is not None else "",
+                "description": d.text if d is not None else "",
+                "style": s.text if s is not None else ""
+            })
+        st.dataframe(pd.DataFrame(info))
         st.stop()
 
-    return pd.DataFrame(puntos)
 
 # ─── Carga de ficheros Georadar ────────────────────────────────────────────────
 
