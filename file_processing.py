@@ -19,8 +19,7 @@ def extract_kml_from_kmz(kmz_file):
 # ─── Parser de KML con filtros específicos ─────────────────────────────────────
 
 def parse_kml_data(kml_bytes):
-    """Lee los <Placemark> cuyo <name> empiece por 'MapExport', 
-    excluye los de color rojo (ff0000ff) o con descripción 'Obstacle'."""
+    """Lee <Document> cuyo <name> empiece por 'MapExport' y extrae sus puntos válidos."""
     try:
         tree = ET.ElementTree(ET.fromstring(kml_bytes))
     except Exception:
@@ -30,64 +29,60 @@ def parse_kml_data(kml_bytes):
     ns = {'kml': 'http://www.opengis.net/kml/2.2'}
     root = tree.getroot()
 
-    # Mapear estilos (id -> color)
+    # Mapa de estilos (id → color)
     style_map = {}
     for style in root.findall(".//kml:Style", ns):
-        style_id = style.attrib.get("id", "")
-        color_el = style.find(".//kml:LineStyle/kml:color", ns)
+        sid = style.attrib.get("id", "")
+        color_el = style.find(".//kml:IconStyle/kml:color", ns)
         if color_el is not None:
-            style_map[style_id] = color_el.text.strip().lower()
+            style_map[sid] = color_el.text.strip().lower()
 
     puntos = []
 
-    for placemark in root.findall(".//kml:Placemark", ns):
-        name_el = placemark.find("kml:name", ns)
-        desc_el = placemark.find("kml:description", ns)
-        style_url_el = placemark.find("kml:styleUrl", ns)
-
-        name = name_el.text.strip() if name_el is not None else ""
-        description = desc_el.text.strip() if desc_el is not None else ""
-        style_ref = style_url_el.text.strip().replace("#", "") if style_url_el is not None else ""
-
-        # Filtros de exclusión
-        if not name.startswith("MapExport"):
-            continue
-        if "obstacle" in description.lower():
-            continue
-        if style_ref in style_map and style_map[style_ref] == "ff0000ff":
+    # Recorre documentos MapExport
+    for doc in root.findall(".//kml:Document", ns):
+        doc_name_el = doc.find("kml:name", ns)
+        doc_name = doc_name_el.text.strip() if doc_name_el is not None else ""
+        if not doc_name.startswith("MapExport"):
             continue
 
-        # Extraer coordenadas
-        coords_list = placemark.findall(".//kml:coordinates", ns)
-        for coord in coords_list:
-            raw_text = coord.text.strip()
-            for line in raw_text.split():
-                parts = line.split(",")
-                if len(parts) >= 2:
-                    lon, lat = float(parts[0]), float(parts[1])
-                    puntos.append({
-                        "Latitude - Functional Location": lat,
-                        "Longitude - Functional Location": lon,
-                        "Service Address - Functional Location": name,
-                        "Summary - Work Order": name,
-                    })
+        # Recorre placemarks del documento
+        for placemark in doc.findall(".//kml:Placemark", ns):
+            name_el = placemark.find("kml:name", ns)
+            desc_el = placemark.find("kml:description", ns)
+            style_url_el = placemark.find("kml:styleUrl", ns)
+
+            name = name_el.text.strip() if name_el is not None else ""
+            desc = desc_el.text.strip() if desc_el is not None else ""
+            style_ref = style_url_el.text.strip().replace("#", "") if style_url_el is not None else ""
+
+            # Exclusiones
+            if name.lower() == "currentsurveypath":
+                continue
+            if "obstacle" in desc.lower():
+                continue
+            if style_ref in style_map and style_map[style_ref] == "ff0000ff":
+                continue
+
+            # Coordenadas válidas
+            for coord in placemark.findall(".//kml:Point/kml:coordinates", ns):
+                raw = coord.text.strip()
+                for line in raw.split():
+                    parts = line.split(",")
+                    if len(parts) >= 2:
+                        lon, lat = float(parts[0]), float(parts[1])
+                        puntos.append({
+                            "Latitude - Functional Location": lat,
+                            "Longitude - Functional Location": lon,
+                            "Service Address - Functional Location": doc_name,
+                            "Summary - Work Order": doc_name,
+                        })
 
     if not puntos:
-        st.warning("⚠️ No coordinates matched filters. Debug info below:")
-        placemarks = root.findall(".//kml:Placemark", ns)
-        info = []
-        for p in placemarks:
-            n = p.find("kml:name", ns)
-            d = p.find("kml:description", ns)
-            s = p.find("kml:styleUrl", ns)
-            info.append({
-                "name": n.text if n is not None else "",
-                "description": d.text if d is not None else "",
-                "style": s.text if s is not None else ""
-            })
-        st.dataframe(pd.DataFrame(info))
+        st.error("❌ No valid coordinates found in KML after filtering.")
         st.stop()
 
+    return pd.DataFrame(puntos)
 
 # ─── Carga de ficheros Georadar ────────────────────────────────────────────────
 
