@@ -167,7 +167,12 @@ with tab1:
 
         val = ""
         if col_sel == "Name - Child Functional Location":
-            parents = edited["Parent"].dropna().unique() if "Parent" in edited.columns else []
+            parents = (
+                edited["Name - Parent Functional Location"].dropna().unique().tolist()
+                if "Name - Parent Functional Location" in edited.columns
+                else []
+            )
+
             par = parents[0] if len(parents) else None
             if par and par in config.parent_child_map:
                 val = st.selectbox("Child value", config.parent_child_map[par])
