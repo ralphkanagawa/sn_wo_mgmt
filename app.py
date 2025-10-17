@@ -193,7 +193,7 @@ with tab1:
         st.write("⏱️ Autofill date/time")
         d0 = st.date_input("Initial Date", value=date.today())
         t0 = st.time_input("Initial Time", value=datetime.now().time().replace(second=0, microsecond=0))
-        if st.button("🕒 Generate each 27 min"):
+        if st.button("🕒 Generate each 7 min"):
             incs = generate_time_windows(d0, t0, len(st.session_state.latest_edited))
             new_df = fill_temporal_columns(st.session_state.latest_edited.copy(), incs)
             st.session_state.edited_df = new_df
