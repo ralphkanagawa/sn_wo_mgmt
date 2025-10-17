@@ -46,7 +46,7 @@ def fill_temporal_columns(df, incs):
 
     for c in full_to:
         if c in df.columns:
-            df[c] = [(d + timedelta(minutes=1)).strftime("%d/%m/%Y %I:%M %p") for d in incs]
+            df[c] = [(d + timedelta(minutes=7)).strftime("%d/%m/%Y %I:%M %p") for d in incs]
 
     for c in time_from:
         if c in df.columns:
@@ -54,6 +54,6 @@ def fill_temporal_columns(df, incs):
 
     for c in time_to:
         if c in df.columns:
-            df[c] = [(d + timedelta(minutes=1)).strftime("%I:%M %p") for d in incs]
+            df[c] = [(d + timedelta(minutes=7)).strftime("%I:%M %p") for d in incs]
 
     return df
