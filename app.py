@@ -318,6 +318,12 @@ with tab2:
         st.warning("No data available. Please, load and edit on the Work Order Management tab.")
     else:
         df_full = st.session_state.df.copy()
+
+        # --- Asegurar columnas Parent/Child para el resumen ---
+        for col in ["Parent", "Child"]:
+            if col not in df_full.columns:
+                df_full[col] = ""
+
         save_geoposition_map(df_full, "map_contextual.png")
 
         col1, col2, col3 = st.columns([1, 2, 1])
@@ -326,11 +332,11 @@ with tab2:
 
         # --- Estadísticas básicas ---
         total_ordenes = len(df_full)
-        total_yes = (df_full["Gateway"] == "YES").sum()
-        total_no = (df_full["Gateway"] == "NO").sum()
+        total_yes = (df_full["Gateway"] == "YES").sum() if "Gateway" in df_full.columns else 0
+        total_no = (df_full["Gateway"] == "NO").sum() if "Gateway" in df_full.columns else 0
 
-        parent_locs = safe_unique(df_full, "Name - Parent Functional Location")
-        child_locs = safe_unique(df_full, "Name - Child Functional Location")
+        parent_locs = safe_unique(df_full, "Parent")
+        child_locs = safe_unique(df_full, "Child")
 
         region_auto = ""
         if parent_locs and child_locs:
@@ -385,21 +391,21 @@ with tab2:
         if st.button("📄 Generate Report DOCX"):
             # --- Agrupar datos reales por Parent/Child ---
             axes = []
-            if "Name - Parent Functional Location" in df_full.columns and "Name - Child Functional Location" in df_full.columns:
+            if "Parent" in df_full.columns and "Child" in df_full.columns:
                 grouped = (
-                    df_full.groupby(["Name - Parent Functional Location", "Name - Child Functional Location"])
+                    df_full.groupby(["Parent", "Child"])
                     .size()
                     .reset_index(name="nb")
                 )
                 for _, r in grouped.iterrows():
                     axes.append({
-                        "commune": r["Name - Parent Functional Location"],
-                        "axe": r["Name - Child Functional Location"],
-                        "nom_axe": f"{r['Name - Child Functional Location']}",
+                        "commune": r["Parent"],
+                        "axe": r["Child"],
+                        "nom_axe": f"{r['Child']}",
                         "nb": int(r["nb"]),
                     })
             else:
-                st.warning("Missing parent/child columns in data. Cannot summarize axes.")
+                st.warning("Missing Parent/Child columns in data. Cannot summarize axes.")
 
             # Mostrar previsualización del resumen
             if axes:
