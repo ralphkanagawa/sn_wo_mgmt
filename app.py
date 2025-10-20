@@ -324,14 +324,14 @@ with tab2:
         with col2:
             st.image("map_contextual.png", use_container_width=True)
 
-        # Recalcular contexto
+        # --- Estadísticas básicas ---
         total_ordenes = len(df_full)
         total_yes = (df_full["Gateway"] == "YES").sum()
         total_no = (df_full["Gateway"] == "NO").sum()
-        
+
         parent_locs = safe_unique(df_full, "Name - Parent Functional Location")
         child_locs = safe_unique(df_full, "Name - Child Functional Location")
-        
+
         region_auto = ""
         if parent_locs and child_locs:
             region_auto = f"{parent_locs[0]} – {child_locs[0]}"
@@ -339,42 +339,31 @@ with tab2:
             region_auto = parent_locs[0]
         elif child_locs:
             region_auto = child_locs[0]
-        
-        context = {
-            "fecha": datetime.now().strftime("%d/%m/%Y"),
-            "total_ordenes": total_ordenes,
-            "total_yes": total_yes,
-            "total_no": total_no,
-            "parent_locations": parent_locs,
-            "child_locations": child_locs,
-        }
-        
-        total_points = st.session_state.get("total_points", 0)
-        
-        # --- Formulario en 3 columnas ---
+
+        total_points = len(df_full)
+
+        # --- Formulario de metadatos ---
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             date = st.text_input("Date", value=datetime.now().strftime("%d/%m/%Y"))
             region_departement = st.text_input("Région–Département", value=region_auto)
             point_focal = st.text_input("Point Focal")
             rep_aner = st.text_input("Représentant ANER")
-        
+
         with col2:
             rep_salvi = st.text_input("Représentant SALVI Sénégal")
-            total_commune = st.text_input(
-                "Total lampadaires attribués à la commune", value=str(total_points)
-            )
+            total_commune = st.text_input("Total lampadaires attribués à la commune", value=str(total_points))
             total_affectes = st.text_input("Total lampadaires affectés à la suite des visites")
             surplus = st.text_input("Restants/Surplus")
-        
+
         with col3:
             observations = st.text_area("Observations globales")
             date_salvi = st.text_input("Date SALVI")
             date_aner = st.text_input("Date ANER")
             nom_prefet = st.text_input("Nom Préfet/Sous-Préfet")
             date_prefet = st.text_input("Date Préfet/Sous-Préfet")
-        
+
         report_meta = {
             "date": date,
             "region_departement": region_departement,
@@ -394,41 +383,37 @@ with tab2:
         from docxtpl import DocxTemplate
 
         if st.button("📄 Generate Report DOCX"):
-            # Cargar plantilla Word con placeholders
-            doc = DocxTemplate("report_template.docx")
-        
-            # --- NUEVO: resumen de puntos por fichero ---
+            # --- Agrupar datos reales por Parent/Child ---
             axes = []
-            
-            points_data = st.session_state.get("points_data", {})
-            points_info = points_data.get("per_file", {})
-            
-            if not points_info:
-                st.warning("No point count data found. Please process files first.")
-            else:
-                parent_val = df_full["Name - Parent Functional Location"].iloc[0] if "Name - Parent Functional Location" in df_full.columns else ""
-                child_val = df_full["Name - Child Functional Location"].iloc[0] if "Name - Child Functional Location" in df_full.columns else ""
-            
-                for file_name, point_count in points_info.items():
+            if "Name - Parent Functional Location" in df_full.columns and "Name - Child Functional Location" in df_full.columns:
+                grouped = (
+                    df_full.groupby(["Name - Parent Functional Location", "Name - Child Functional Location"])
+                    .size()
+                    .reset_index(name="nb")
+                )
+                for _, r in grouped.iterrows():
                     axes.append({
-                        "commune": parent_val,
-                        "axe": child_val,
-                        "nom_axe": file_name,
-                        "nb": point_count
+                        "commune": r["Name - Parent Functional Location"],
+                        "axe": r["Name - Child Functional Location"],
+                        "nom_axe": f"{r['Name - Child Functional Location']}",
+                        "nb": int(r["nb"]),
                     })
+            else:
+                st.warning("Missing parent/child columns in data. Cannot summarize axes.")
 
-                # Mostrar lo que se va a exportar
-                st.write("### Puntos que se incluirán en el informe")
+            # Mostrar previsualización del resumen
+            if axes:
+                st.write("### Puntos incluidos en el informe")
                 st.dataframe(pd.DataFrame(axes))
 
-            # Contexto para la plantilla
+            # Contexto para plantilla Word
             context_tpl = {
                 "date": report_meta["date"],
                 "region_departement": report_meta["region_departement"],
                 "point_focal": report_meta["point_focal"],
                 "rep_aner": report_meta["rep_aner"],
                 "rep_salvi": report_meta["rep_salvi"],
-                "total_commune": st.session_state.get("total_points", 0),
+                "total_commune": total_points,
                 "total_affectes": report_meta["total_affectes"],
                 "surplus": report_meta["surplus"],
                 "observations": report_meta["observations"],
@@ -436,17 +421,15 @@ with tab2:
                 "nom_prefet": report_meta["nom_prefet"],
                 "date_prefet": report_meta["date_prefet"],
                 "date_aner": report_meta["date_aner"],
-                "date_salvi": report_meta["date_salvi"]
+                "date_salvi": report_meta["date_salvi"],
             }
-        
-            # Renderizar plantilla
+
+            # --- Generar DOCX ---
+            doc = DocxTemplate("report_template.docx")
             doc.render(context_tpl)
-        
-            # Guardar en archivo temporal
             output_path = "informe.docx"
             doc.save(output_path)
-        
-            # Botón de descarga
+
             with open(output_path, "rb") as f:
                 st.download_button(
                     "⬇️ Download Report DOCX",
