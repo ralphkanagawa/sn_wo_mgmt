@@ -389,28 +389,62 @@ with tab2:
         from docxtpl import DocxTemplate
 
         if st.button("📄 Generate Report DOCX"):
-            # --- Agrupar datos reales por Parent/Child ---
+            # --- Agrupar datos reales ---
             axes = []
+
             if "Parent" in df_full.columns and "Child" in df_full.columns:
-                grouped = (
-                    df_full.groupby(["Parent", "Child"])
-                    .size()
-                    .reset_index(name="nb")
-                )
-                for _, r in grouped.iterrows():
-                    axes.append({
-                        "commune": r["Parent"],
-                        "axe": r["Child"],
-                        "nom_axe": f"{r['Child']}",
-                        "nb": int(r["nb"]),
-                    })
+                # Si Parent/Child están vacíos, usar Service Address o Summary como fallback
+                if df_full["Parent"].replace("", pd.NA).isna().all() and df_full["Child"].replace("", pd.NA).isna().all():
+                    if "Service Address - Functional Location" in df_full.columns:
+                        grouped = (
+                            df_full.groupby("Service Address - Functional Location")
+                            .size()
+                            .reset_index(name="nb")
+                            .rename(columns={"Service Address - Functional Location": "axe"})
+                        )
+                        for _, r in grouped.iterrows():
+                            axes.append({
+                                "commune": "",
+                                "axe": r["axe"],
+                                "nom_axe": r["axe"],
+                                "nb": int(r["nb"]),
+                            })
+                    elif "Summary - Work Order" in df_full.columns:
+                        grouped = (
+                            df_full.groupby("Summary - Work Order")
+                            .size()
+                            .reset_index(name="nb")
+                            .rename(columns={"Summary - Work Order": "axe"})
+                        )
+                        for _, r in grouped.iterrows():
+                            axes.append({
+                                "commune": "",
+                                "axe": r["axe"],
+                                "nom_axe": r["axe"],
+                                "nb": int(r["nb"]),
+                            })
+                else:
+                    grouped = (
+                        df_full.groupby(["Parent", "Child"])
+                        .size()
+                        .reset_index(name="nb")
+                    )
+                    for _, r in grouped.iterrows():
+                        axes.append({
+                            "commune": r["Parent"],
+                            "axe": r["Child"],
+                            "nom_axe": f"{r['Child']}",
+                            "nb": int(r["nb"]),
+                        })
             else:
-                st.warning("Missing Parent/Child columns in data. Cannot summarize axes.")
+                st.warning("No Parent/Child columns found in data.")
 
             # Mostrar previsualización del resumen
             if axes:
                 st.write("### Puntos incluidos en el informe")
                 st.dataframe(pd.DataFrame(axes))
+            else:
+                st.warning("No se encontraron puntos para incluir en el informe.")
 
             # Contexto para plantilla Word
             context_tpl = {
